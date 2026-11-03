@@ -1,0 +1,15 @@
+[
+  {
+    "name": "HUB-SITE-NETS",
+    "addresses": [
+      "10.200.0.0/16"
+    ],
+    "specs": [
+      {
+        "protocol": "any",
+        "port_range": "0"
+      }
+    ],
+    "type": "custom"
+  }
+]

@@ -1,0 +1,23 @@
+# management services and LLDP
+set system services netconf ssh
+set protocols lldp interface all
+set system services ssh protocol-version v2
+# LAB ONLY: hub-site test host on the overlay loopback
+set interfaces lo0 unit 1 family inet address 10.200.8.1/32
+# hub-site prefix behind the hub, advertised to the spokes (lab: discard route + test host on lo0.1)
+set routing-instances vpn_OrgOverlay routing-options static route 10.200.0.0/16 discard
+set policy-options policy-statement OrgOverlay_advertise term 10_hub_site from protocol static
+set policy-options policy-statement OrgOverlay_advertise term 10_hub_site from route-filter 10.200.0.0/16 exact
+set policy-options policy-statement OrgOverlay_advertise term 10_hub_site then next-hop self
+set policy-options policy-statement OrgOverlay_advertise term 10_hub_site then accept
+# spokes must not leak MNHA control addresses into the overlay
+set policy-options policy-statement OVERLAY-IN term no-mnha from route-filter 10.255.0.0/16 orlonger
+set policy-options policy-statement OVERLAY-IN term no-mnha then reject
+set policy-options policy-statement OVERLAY-IN term rest then accept
+set routing-instances vpn_OrgOverlay protocols bgp group OrgOverlay_overlay import OVERLAY-IN
+# BFD on the overlay iBGP, same timers as the spokes
+set routing-instances vpn_OrgOverlay protocols bgp group OrgOverlay_overlay bfd-liveness-detection minimum-interval 1000
+set routing-instances vpn_OrgOverlay protocols bgp group OrgOverlay_overlay bfd-liveness-detection multiplier 3
+# DPD always-send on the Mist-generated hub gateway
+delete security ike gateway OrgOverlay_hub_on_wan dead-peer-detection optimized
+set security ike gateway OrgOverlay_hub_on_wan dead-peer-detection always-send

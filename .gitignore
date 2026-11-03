@@ -1,0 +1,8 @@
+.DS_Store
+._*
+*.swp
+*~
+.idea/
+.vscode/
+mist_import_manifest.json
+*.tmp

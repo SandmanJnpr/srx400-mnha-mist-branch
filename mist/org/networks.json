@@ -1,0 +1,74 @@
+[
+  {
+    "name": "MGMT",
+    "vlan_id": 10,
+    "subnet": "10.10.10.0/24",
+    "gateway": "10.10.10.1",
+    "internet_access": {
+      "enabled": true,
+      "restricted": false,
+      "create_simple_service_policy": false
+    }
+  },
+  {
+    "name": "CORP",
+    "vlan_id": 20,
+    "subnet": "10.10.20.0/24",
+    "gateway": "10.10.20.1",
+    "internet_access": {
+      "enabled": true,
+      "restricted": false,
+      "create_simple_service_policy": false
+    }
+  },
+  {
+    "name": "GUEST",
+    "vlan_id": 30,
+    "subnet": "10.10.30.0/24",
+    "gateway": "10.10.30.1",
+    "internet_access": {
+      "enabled": true,
+      "restricted": false,
+      "create_simple_service_policy": false
+    }
+  },
+  {
+    "name": "MEDIA",
+    "vlan_id": 40,
+    "subnet": "10.10.40.0/24",
+    "gateway": "10.10.40.1",
+    "internet_access": {
+      "enabled": true,
+      "restricted": false,
+      "create_simple_service_policy": false
+    }
+  },
+  {
+    "name": "SECURITY",
+    "vlan_id": 50,
+    "subnet": "10.10.50.0/24",
+    "gateway": "10.10.50.1",
+    "internet_access": {
+      "enabled": true,
+      "restricted": false,
+      "create_simple_service_policy": false
+    }
+  },
+  {
+    "name": "IOT",
+    "vlan_id": 60,
+    "subnet": "10.10.60.0/24",
+    "gateway": "10.10.60.1",
+    "internet_access": {
+      "enabled": true,
+      "restricted": false,
+      "create_simple_service_policy": false
+    },
+    "vpn_access": {
+      "OrgOverlay": {
+        "routed": true,
+        "no_readvertise_to_overlay": true
+      }
+    }
+  }
+]

@@ -1,0 +1,527 @@
+{
+  "name": "SRX400-1",
+  "type": "gateway",
+  "networks": [
+    {
+      "name": "MGMT",
+      "vlan_id": 10,
+      "subnet": "10.10.10.0/24",
+      "gateway": "10.10.10.1",
+      "internet_access": {
+        "enabled": true,
+        "restricted": false,
+        "create_simple_service_policy": false
+      }
+    },
+    {
+      "name": "CORP",
+      "vlan_id": 20,
+      "subnet": "10.10.20.0/24",
+      "gateway": "10.10.20.1",
+      "internet_access": {
+        "enabled": true,
+        "restricted": false,
+        "create_simple_service_policy": false
+      }
+    },
+    {
+      "name": "GUEST",
+      "vlan_id": 30,
+      "subnet": "10.10.30.0/24",
+      "gateway": "10.10.30.1",
+      "internet_access": {
+        "enabled": true,
+        "restricted": false,
+        "create_simple_service_policy": false
+      }
+    },
+    {
+      "name": "MEDIA",
+      "vlan_id": 40,
+      "subnet": "10.10.40.0/24",
+      "gateway": "10.10.40.1",
+      "internet_access": {
+        "enabled": true,
+        "restricted": false,
+        "create_simple_service_policy": false
+      }
+    },
+    {
+      "name": "SECURITY",
+      "vlan_id": 50,
+      "subnet": "10.10.50.0/24",
+      "gateway": "10.10.50.1",
+      "internet_access": {
+        "enabled": true,
+        "restricted": false,
+        "create_simple_service_policy": false
+      }
+    },
+    {
+      "name": "IOT",
+      "vlan_id": 60,
+      "subnet": "10.10.60.0/24",
+      "gateway": "10.10.60.1",
+      "internet_access": {
+        "enabled": true,
+        "restricted": false,
+        "create_simple_service_policy": false
+      },
+      "vpn_access": {
+        "OrgOverlay": {
+          "routed": true,
+          "no_readvertise_to_overlay": true
+        }
+      }
+    }
+  ],
+  "ip_configs": {
+    "MGMT": {
+      "type": "static",
+      "ip": "10.10.10.2",
+      "netmask": "/24"
+    },
+    "CORP": {
+      "type": "static",
+      "ip": "10.10.20.2",
+      "netmask": "/24"
+    },
+    "GUEST": {
+      "type": "static",
+      "ip": "10.10.30.2",
+      "netmask": "/24"
+    },
+    "MEDIA": {
+      "type": "static",
+      "ip": "10.10.40.2",
+      "netmask": "/24"
+    },
+    "SECURITY": {
+      "type": "static",
+      "ip": "10.10.50.2",
+      "netmask": "/24"
+    },
+    "IOT": {
+      "type": "static",
+      "ip": "10.10.60.2",
+      "netmask": "/24"
+    }
+  },
+  "port_config": {
+    "ge-0/0/2": {
+      "usage": "wan",
+      "name": "wan",
+      "wan_type": "broadband",
+      "ip_config": {
+        "type": "dhcp"
+      },
+      "vpn_paths": {
+        "HUB-wan.OrgOverlay": {
+          "role": "spoke",
+          "bfd_profile": "broadband"
+        }
+      }
+    },
+    "ge-0/0/3": {
+      "usage": "lan",
+      "port_network": "MGMT",
+      "networks": [
+        "CORP",
+        "GUEST",
+        "MEDIA",
+        "SECURITY",
+        "IOT"
+      ]
+    }
+  },
+  "oob_ip_config": {
+    "type": "static",
+    "ip": "<NODE1-MGMT-IP>",
+    "netmask": "/24",
+    "gateway": "<mgmt-gateway>",
+    "use_mgmt_vrf": false,
+    "node1": {
+      "type": "dhcp"
+    }
+  },
+  "dns_servers": [
+    "8.8.8.8",
+    "1.1.1.1"
+  ],
+  "ntp_servers": [
+    "pool.ntp.org"
+  ],
+  "dhcpd_config": {
+    "enabled": true,
+    "MGMT": {
+      "type": "local",
+      "ip_start": "10.10.10.10",
+      "ip_end": "10.10.10.200",
+      "gateway": "10.10.10.1",
+      "dns_servers": [
+        "1.1.1.1",
+        "8.8.8.8"
+      ]
+    },
+    "CORP": {
+      "type": "local",
+      "ip_start": "10.10.20.10",
+      "ip_end": "10.10.20.200",
+      "gateway": "10.10.20.1",
+      "dns_servers": [
+        "8.8.8.8",
+        "1.1.1.1"
+      ]
+    },
+    "GUEST": {
+      "type": "local",
+      "ip_start": "10.10.30.10",
+      "ip_end": "10.10.30.200",
+      "gateway": "10.10.30.1",
+      "dns_servers": [
+        "1.1.1.1",
+        "8.8.8.8"
+      ]
+    },
+    "MEDIA": {
+      "type": "local",
+      "ip_start": "10.10.40.10",
+      "ip_end": "10.10.40.200",
+      "gateway": "10.10.40.1",
+      "dns_servers": [
+        "8.8.8.8",
+        "1.1.1.1"
+      ]
+    },
+    "SECURITY": {
+      "type": "local",
+      "ip_start": "10.10.50.10",
+      "ip_end": "10.10.50.200",
+      "gateway": "10.10.50.1",
+      "dns_servers": [
+        "8.8.8.8",
+        "1.1.1.1"
+      ]
+    },
+    "IOT": {
+      "type": "local",
+      "ip_start": "10.10.60.10",
+      "ip_end": "10.10.60.200",
+      "gateway": "10.10.60.1",
+      "dns_servers": [
+        "8.8.8.8",
+        "1.1.1.1"
+      ]
+    }
+  },
+  "path_preferences": {
+    "wan": {
+      "strategy": "ordered",
+      "paths": [
+        {
+          "type": "wan",
+          "name": "wan"
+        }
+      ]
+    },
+    "OrgOverlay": {
+      "strategy": "ordered",
+      "paths": [
+        {
+          "type": "vpn",
+          "name": "HUB-wan.OrgOverlay"
+        }
+      ]
+    }
+  },
+  "service_policies": [
+    {
+      "name": "allow-to-hub",
+      "tenants": [
+        "IOT"
+      ],
+      "services": [
+        "HUB-SITE-NETS"
+      ],
+      "action": "allow",
+      "path_preference": "OrgOverlay"
+    },
+    {
+      "name": "Internet",
+      "tenants": [
+        "MGMT",
+        "CORP",
+        "GUEST",
+        "MEDIA",
+        "SECURITY",
+        "IOT"
+      ],
+      "services": [
+        "any"
+      ],
+      "action": "allow",
+      "path_preference": "wan"
+    }
+  ],
+  "additional_config_cmds": [
+    "# before use replace <hub-MAC>, <mgmt-gateway> and <region> (README, Placeholders); <*> is Junos wildcard syntax, keep it",
+    "# management services",
+    "set system services netconf ssh",
+    "# MNHA: node identity, ICL peer and SRG1 (paper 4.4)",
+    "set chassis high-availability local-id 1",
+    "set chassis high-availability local-id local-ip 10.255.0.1",
+    "set chassis high-availability local-id local-forwarding-ip 10.255.1.1",
+    "set chassis high-availability peer-id 2 peer-ip 10.255.0.2",
+    "set chassis high-availability peer-id 2 interface ge-0/0/4.0",
+    "set chassis high-availability peer-id 2 peer-forwarding-ip 10.255.1.2",
+    "set chassis high-availability peer-id 2 peer-forwarding-ip liveness-detection minimum-interval 1000",
+    "set chassis high-availability peer-id 2 peer-forwarding-ip liveness-detection multiplier 3",
+    "set chassis high-availability peer-id 2 liveness-detection minimum-interval 1000",
+    "set chassis high-availability peer-id 2 liveness-detection multiplier 3",
+    "set chassis high-availability services-redundancy-group 1 deployment-type hybrid",
+    "set chassis high-availability services-redundancy-group 1 peer-id 2",
+    "set chassis high-availability services-redundancy-group 1 active-signal-route 10.255.3.1",
+    "set chassis high-availability services-redundancy-group 1 backup-signal-route 10.255.3.2",
+    "set chassis high-availability services-redundancy-group 1 activeness-priority 200",
+    "# SRG1 virtual IPs: the tenant gateways (.1) on the LAN units of ge-0/0/3",
+    "set chassis high-availability services-redundancy-group 1 virtual-ip 1 ip 10.10.10.1/24",
+    "set chassis high-availability services-redundancy-group 1 virtual-ip 1 interface ge-0/0/3.0",
+    "set chassis high-availability services-redundancy-group 1 virtual-ip 1 use-virtual-mac",
+    "set chassis high-availability services-redundancy-group 1 virtual-ip 2 ip 10.10.20.1/24",
+    "set chassis high-availability services-redundancy-group 1 virtual-ip 2 interface ge-0/0/3.20",
+    "set chassis high-availability services-redundancy-group 1 virtual-ip 2 use-virtual-mac",
+    "set chassis high-availability services-redundancy-group 1 virtual-ip 3 ip 10.10.30.1/24",
+    "set chassis high-availability services-redundancy-group 1 virtual-ip 3 interface ge-0/0/3.30",
+    "set chassis high-availability services-redundancy-group 1 virtual-ip 3 use-virtual-mac",
+    "set chassis high-availability services-redundancy-group 1 virtual-ip 4 ip 10.10.40.1/24",
+    "set chassis high-availability services-redundancy-group 1 virtual-ip 4 interface ge-0/0/3.40",
+    "set chassis high-availability services-redundancy-group 1 virtual-ip 4 use-virtual-mac",
+    "set chassis high-availability services-redundancy-group 1 virtual-ip 5 ip 10.10.50.1/24",
+    "set chassis high-availability services-redundancy-group 1 virtual-ip 5 interface ge-0/0/3.50",
+    "set chassis high-availability services-redundancy-group 1 virtual-ip 5 use-virtual-mac",
+    "set chassis high-availability services-redundancy-group 1 virtual-ip 6 ip 10.10.60.1/24",
+    "set chassis high-availability services-redundancy-group 1 virtual-ip 6 interface ge-0/0/3.60",
+    "set chassis high-availability services-redundancy-group 1 virtual-ip 6 use-virtual-mac",
+    "# ICL (ge-0/0/4), inter-node transit link (ge-0/0/5) and the MNHA forwarding address",
+    "set interfaces ge-0/0/4 description \"MNHA ICL to SRX400-2\"",
+    "set interfaces ge-0/0/4 unit 0 family inet address 10.255.0.1/30",
+    "set interfaces ge-0/0/5 description \"inter-node transit link to SRX400-2\"",
+    "set interfaces ge-0/0/5 unit 0 family inet address 10.255.2.1/30",
+    "set interfaces lo0 unit 0 family inet address 10.255.1.1/32",
+    "# zone HA for the ICL and the forwarding addresses",
+    "set security zones security-zone HA interfaces ge-0/0/4.0 host-inbound-traffic system-services all",
+    "set security zones security-zone HA interfaces ge-0/0/4.0 host-inbound-traffic protocols all",
+    "set security zones security-zone HA interfaces lo0.0 host-inbound-traffic system-services all",
+    "set security zones security-zone HA interfaces lo0.0 host-inbound-traffic protocols all",
+    "set security policies from-zone HA to-zone HA policy allow-ha match source-address any",
+    "set security policies from-zone HA to-zone HA policy allow-ha match destination-address any",
+    "set security policies from-zone HA to-zone HA policy allow-ha match application any",
+    "set security policies from-zone HA to-zone HA policy allow-ha then permit",
+    "# master-instance AS (paper 5.6 note)",
+    "set routing-options autonomous-system 65001",
+    "# LLDP",
+    "set protocols lldp interface all",
+    "# overlay iBGP runs the org overlay AS (paper 5.6)",
+    "set routing-instances vpn_OrgOverlay routing-options autonomous-system 65000",
+    "# node-local on the IKE gateway Mist generates for the overlay",
+    "set groups MNHA-NODE-LOCAL security ike gateway <*> node-local",
+    "set apply-groups MNHA-NODE-LOCAL",
+    "# LAB ONLY: inet.0 keeps the out-of-band management default (paper 5.4)",
+    "set routing-options static route 0.0.0.0/0 qualified-next-hop <mgmt-gateway> preference 1",
+    "# active signal route as a policy condition",
+    "set policy-options condition MNHA-ACTIVE if-route-exists address-family inet 10.255.3.1/32",
+    "set policy-options condition MNHA-ACTIVE if-route-exists address-family inet table inet.0",
+    "# BFD on the overlay iBGP (BGP hold time is 90 s)",
+    "set routing-instances vpn_OrgOverlay protocols bgp group OrgOverlay_overlay bfd-liveness-detection minimum-interval 1000",
+    "set routing-instances vpn_OrgOverlay protocols bgp group OrgOverlay_overlay bfd-liveness-detection multiplier 3",
+    "# SRG1 monitors the LAN interface; MNHA forwarding path on the ICL",
+    "set chassis high-availability services-redundancy-group 1 monitor interface ge-0/0/3",
+    "set chassis high-availability peer-id 2 peer-forwarding-ip interface ge-0/0/4.0",
+    "set routing-options static route 10.255.1.2/32 next-hop 10.255.0.2",
+    "# LAB ONLY: the WAN (ge-0/0/2) sits in WAN-VR with the transit link (paper 5.4)",
+    "set routing-instances WAN-VR instance-type virtual-router",
+    "set routing-instances WAN-VR interface ge-0/0/2.0",
+    "set routing-instances WAN-VR interface ge-0/0/5.0",
+    "set routing-instances WAN-VR routing-options router-id 10.255.2.1",
+    "set routing-instances WAN-VR routing-options autonomous-system 65001",
+    "# tenant subnets: discard at preference 250, exported to the peer only by the SRG1-active node",
+    "set routing-instances WAN-VR routing-options static route 10.10.10.0/24 discard",
+    "set routing-instances WAN-VR routing-options static route 10.10.10.0/24 preference 250",
+    "set routing-instances WAN-VR routing-options static route 10.10.20.0/24 discard",
+    "set routing-instances WAN-VR routing-options static route 10.10.20.0/24 preference 250",
+    "set routing-instances WAN-VR routing-options static route 10.10.30.0/24 discard",
+    "set routing-instances WAN-VR routing-options static route 10.10.30.0/24 preference 250",
+    "set routing-instances WAN-VR routing-options static route 10.10.40.0/24 discard",
+    "set routing-instances WAN-VR routing-options static route 10.10.40.0/24 preference 250",
+    "set routing-instances WAN-VR routing-options static route 10.10.50.0/24 discard",
+    "set routing-instances WAN-VR routing-options static route 10.10.50.0/24 preference 250",
+    "set routing-instances WAN-VR routing-options static route 10.10.60.0/24 discard",
+    "set routing-instances WAN-VR routing-options static route 10.10.60.0/24 preference 250",
+    "# hub-site routes from this node's own tunnel",
+    "set routing-instances WAN-VR routing-options instance-import HUB-FROM-OVERLAY",
+    "# hub-site prefixes learned over this node's own tunnel, tagged for export to the peer",
+    "set policy-options community HUB-LOCAL members 65000:1000",
+    "set policy-options policy-statement HUB-FROM-OVERLAY term hub from instance vpn_OrgOverlay",
+    "set policy-options policy-statement HUB-FROM-OVERLAY term hub from protocol bgp",
+    "set policy-options policy-statement HUB-FROM-OVERLAY term hub from route-filter 10.200.0.0/16 orlonger",
+    "set policy-options policy-statement HUB-FROM-OVERLAY term hub then community add HUB-LOCAL",
+    "set policy-options policy-statement HUB-FROM-OVERLAY term hub then accept",
+    "set policy-options policy-statement HUB-FROM-OVERLAY term end then reject",
+    "# to the peer: own default, tenant /24s only from the SRG1-active node, own hub-site routes",
+    "set policy-options policy-statement WAN-EXPORT term default from route-filter 0.0.0.0/0 exact",
+    "set policy-options policy-statement WAN-EXPORT term default then accept",
+    "set policy-options policy-statement WAN-EXPORT term lan from protocol static",
+    "set policy-options policy-statement WAN-EXPORT term lan from route-filter 10.10.10.0/24 exact",
+    "set policy-options policy-statement WAN-EXPORT term lan from route-filter 10.10.20.0/24 exact",
+    "set policy-options policy-statement WAN-EXPORT term lan from route-filter 10.10.30.0/24 exact",
+    "set policy-options policy-statement WAN-EXPORT term lan from route-filter 10.10.40.0/24 exact",
+    "set policy-options policy-statement WAN-EXPORT term lan from route-filter 10.10.50.0/24 exact",
+    "set policy-options policy-statement WAN-EXPORT term lan from route-filter 10.10.60.0/24 exact",
+    "set policy-options policy-statement WAN-EXPORT term lan from condition MNHA-ACTIVE",
+    "set policy-options policy-statement WAN-EXPORT term lan then accept",
+    "set policy-options policy-statement WAN-EXPORT term hub from community HUB-LOCAL",
+    "set policy-options policy-statement WAN-EXPORT term hub then accept",
+    "set policy-options policy-statement WAN-EXPORT term end then reject",
+    "# from the peer: hub-site routes rank below this node's own overlay routes",
+    "set policy-options policy-statement ICD-IMPORT term hub from route-filter 10.200.0.0/16 orlonger",
+    "set policy-options policy-statement ICD-IMPORT term hub then preference 175",
+    "set policy-options policy-statement ICD-IMPORT term hub then accept",
+    "set policy-options policy-statement ICD-IMPORT term rest then accept",
+    "# eBGP over the transit link and the leak into the tenant routing instances",
+    "set routing-instances WAN-VR protocols bgp group ICD type external",
+    "set routing-instances WAN-VR protocols bgp group ICD family inet unicast rib-group WAN-LEAK",
+    "set routing-instances WAN-VR protocols bgp group ICD import ICD-IMPORT",
+    "set routing-instances WAN-VR protocols bgp group ICD export WAN-EXPORT",
+    "set routing-instances WAN-VR protocols bgp group ICD peer-as 65002",
+    "set routing-instances WAN-VR protocols bgp group ICD neighbor 10.255.2.2",
+    "set routing-instances WAN-VR protocols bgp group ICD bfd-liveness-detection minimum-interval 300",
+    "set routing-instances WAN-VR protocols bgp group ICD bfd-liveness-detection multiplier 3",
+    "set routing-options rib-groups WAN-LEAK import-rib WAN-VR.inet.0",
+    "set routing-options rib-groups WAN-LEAK import-rib lan.inet.0",
+    "set routing-options rib-groups WAN-LEAK import-rib GUEST-VR.inet.0",
+    "set routing-options rib-groups WAN-LEAK import-policy WAN-LEAK-POL",
+    "set policy-options policy-statement WAN-LEAK-POL term wan to rib WAN-VR.inet.0",
+    "set policy-options policy-statement WAN-LEAK-POL term wan then accept",
+    "set policy-options policy-statement WAN-LEAK-POL term default from route-filter 0.0.0.0/0 exact",
+    "set policy-options policy-statement WAN-LEAK-POL term default then accept",
+    "set policy-options policy-statement WAN-LEAK-POL term end then reject",
+    "# lan: keep Mist's overlay import; default next-table WAN-VR",
+    "set routing-instances lan routing-options instance-import vpn_OrgOverlay_bgp",
+    "set routing-instances lan routing-options static route 0.0.0.0/0 next-table WAN-VR.inet.0",
+    "# GUEST-VR: GUEST and its DHCP group and pool move out of Mist's lan VR",
+    "delete groups top routing-instances lan interface ge-0/0/3.30",
+    "set routing-instances GUEST-VR instance-type virtual-router",
+    "set routing-instances GUEST-VR interface ge-0/0/3.30",
+    "delete groups top routing-instances lan system services dhcp-local-server group GUEST",
+    "delete groups top routing-instances lan access address-assignment pool GUEST",
+    "set routing-instances GUEST-VR access address-assignment pool GUEST family inet dhcp-attributes name-server 1.1.1.1",
+    "set routing-instances GUEST-VR access address-assignment pool GUEST family inet dhcp-attributes name-server 8.8.8.8",
+    "set routing-instances GUEST-VR access address-assignment pool GUEST family inet dhcp-attributes router 10.10.30.1",
+    "set routing-instances GUEST-VR access address-assignment pool GUEST family inet network 10.10.30.0/24",
+    "set routing-instances GUEST-VR access address-assignment pool GUEST family inet range GUEST high 10.10.30.200",
+    "set routing-instances GUEST-VR access address-assignment pool GUEST family inet range GUEST low 10.10.30.10",
+    "set routing-instances GUEST-VR system services dhcp-local-server group GUEST interface ge-0/0/3.30",
+    "set routing-instances GUEST-VR routing-options static route 0.0.0.0/0 next-table WAN-VR.inet.0",
+    "set routing-instances GUEST-VR routing-options static route 0.0.0.0/0 preference 200",
+    "# no APBR: VR routing decides the exit",
+    "delete apply-groups apbr",
+    "# zone ICD and the tenant -> ICD policies (paper 5.4)",
+    "set security zones security-zone ICD interfaces ge-0/0/5.0 host-inbound-traffic system-services all",
+    "set security zones security-zone ICD interfaces ge-0/0/5.0 host-inbound-traffic protocols all",
+    "set security policies from-zone MGMT to-zone ICD policy MGMT-xnode match source-address any",
+    "set security policies from-zone MGMT to-zone ICD policy MGMT-xnode match destination-address any",
+    "set security policies from-zone MGMT to-zone ICD policy MGMT-xnode match application any",
+    "set security policies from-zone MGMT to-zone ICD policy MGMT-xnode then permit",
+    "set security policies from-zone CORP to-zone ICD policy CORP-xnode match source-address any",
+    "set security policies from-zone CORP to-zone ICD policy CORP-xnode match destination-address any",
+    "set security policies from-zone CORP to-zone ICD policy CORP-xnode match application any",
+    "set security policies from-zone CORP to-zone ICD policy CORP-xnode then permit",
+    "set security policies from-zone GUEST to-zone ICD policy GUEST-xnode match source-address any",
+    "set security policies from-zone GUEST to-zone ICD policy GUEST-xnode match destination-address any",
+    "set security policies from-zone GUEST to-zone ICD policy GUEST-xnode match application any",
+    "set security policies from-zone GUEST to-zone ICD policy GUEST-xnode then permit",
+    "set security policies from-zone MEDIA to-zone ICD policy MEDIA-xnode match source-address any",
+    "set security policies from-zone MEDIA to-zone ICD policy MEDIA-xnode match destination-address any",
+    "set security policies from-zone MEDIA to-zone ICD policy MEDIA-xnode match application any",
+    "set security policies from-zone MEDIA to-zone ICD policy MEDIA-xnode then permit",
+    "set security policies from-zone SECURITY to-zone ICD policy SECURITY-xnode match source-address any",
+    "set security policies from-zone SECURITY to-zone ICD policy SECURITY-xnode match destination-address any",
+    "set security policies from-zone SECURITY to-zone ICD policy SECURITY-xnode match application any",
+    "set security policies from-zone SECURITY to-zone ICD policy SECURITY-xnode then permit",
+    "# [after enrollment] GeoIP deny on the ICD path, kept here above IOT-xnode (paper 5.1, 8 step 9)",
+    "set security policies from-zone IOT to-zone ICD policy GEO-BLOCK-DE match source-address any",
+    "set security policies from-zone IOT to-zone ICD policy GEO-BLOCK-DE match destination-address GEO-DE",
+    "set security policies from-zone IOT to-zone ICD policy GEO-BLOCK-DE match application any",
+    "set security policies from-zone IOT to-zone ICD policy GEO-BLOCK-DE then deny",
+    "set security policies from-zone IOT to-zone ICD policy GEO-BLOCK-DE then count",
+    "# IOT -> ICD cross-node permit (paper 5.4)",
+    "set security policies from-zone IOT to-zone ICD policy IOT-xnode match source-address any",
+    "set security policies from-zone IOT to-zone ICD policy IOT-xnode match destination-address any",
+    "set security policies from-zone IOT to-zone ICD policy IOT-xnode match application any",
+    "set security policies from-zone IOT to-zone ICD policy IOT-xnode then permit",
+    "# from the peer to this node's ISP, and into this node's tunnel to the hub",
+    "set security policies from-zone ICD to-zone wan policy xnode-out match source-address any",
+    "set security policies from-zone ICD to-zone wan policy xnode-out match destination-address any",
+    "set security policies from-zone ICD to-zone wan policy xnode-out match application any",
+    "set security policies from-zone ICD to-zone wan policy xnode-out then permit",
+    "set security policies from-zone ICD to-zone vpn_OrgOverlay policy xnode-iot match source-address any",
+    "set security policies from-zone ICD to-zone vpn_OrgOverlay policy xnode-iot match destination-address any",
+    "set security policies from-zone ICD to-zone vpn_OrgOverlay policy xnode-iot match application any",
+    "set security policies from-zone ICD to-zone vpn_OrgOverlay policy xnode-iot then permit",
+    "# source NAT for traffic from the peer (paper 5.3)",
+    "set security nat source rule-set ICD_to_wan from zone ICD",
+    "set security nat source rule-set ICD_to_wan to zone wan",
+    "set security nat source rule-set ICD_to_wan rule xnode match source-address 0.0.0.0/0",
+    "set security nat source rule-set ICD_to_wan rule xnode then source-nat interface",
+    "# hub prefers the SRG1-active node's IOT route (local-preference 200)",
+    "set policy-options policy-statement IOT-LP term active from condition MNHA-ACTIVE",
+    "set policy-options policy-statement IOT-LP term active then local-preference 200",
+    "set routing-instances vpn_OrgOverlay protocols bgp group OrgOverlay_overlay export [ IOT-LP OrgOverlay_advertise ]",
+    "# lan does not import Mist's inet.0 default",
+    "delete groups top routing-instances lan routing-options instance-import wan_default",
+    "# DPD always-send on the Mist-generated IKE gateway",
+    "delete security ike gateway wan_to_<hub-MAC>_wan dead-peer-detection optimized",
+    "set security ike gateway wan_to_<hub-MAC>_wan dead-peer-detection always-send",
+    "# syslog, as built",
+    "set system syslog archive size 1m",
+    "set system syslog archive files 10",
+    "set system syslog file messages any notice",
+    "set system syslog file messages authorization info",
+    "# DHCP: SRG1 managed services and Active Leasequery (paper 5.5)",
+    "set chassis high-availability services-redundancy-group 1 managed-services dhcp",
+    "set routing-instances lan system services dhcp-local-server active-leasequery peer-address 10.10.10.3",
+    "set routing-instances lan system services dhcp-local-server active-leasequery timeout 60",
+    "set routing-instances lan system services dhcp-local-server active-leasequery idle-timeout 10",
+    "set routing-instances GUEST-VR system services dhcp-local-server active-leasequery peer-address 10.10.30.3",
+    "set routing-instances GUEST-VR system services dhcp-local-server active-leasequery timeout 60",
+    "set routing-instances GUEST-VR system services dhcp-local-server active-leasequery idle-timeout 10",
+    "set system processes dhcp-service accept-max-tcp-connections 100",
+    "set system processes dhcp-service request-max-tcp-connections 100",
+    "set system processes dhcp-service max-leasequery-reply-packet-retries 40",
+    "set system processes dhcp-service leasequery-reply-packet-retry-timer 20",
+    "set system processes dhcp-service max-leasequery-reply-packet-process 500",
+    "# [after enrollment] ATP Cloud / SecIntel lines, as written by enrollment (paper 5.2, 8 step 8)",
+    "set services advanced-anti-malware connection url https://srxapi-v2.<region>.sky.junipersecurity.net",
+    "set services advanced-anti-malware connection authentication tls-profile aamw-ssl",
+    "set services security-intelligence url https://cloudfeeds-v2.sky.junipersecurity.net/api/manifest.xml",
+    "set services security-intelligence authentication tls-profile aamw-ssl",
+    "set services ssl initiation profile aamw-ssl trusted-ca aamw-secintel-ca",
+    "set services ssl initiation profile aamw-ssl trusted-ca aamw-cloud-ca",
+    "set services ssl initiation profile aamw-ssl client-certificate aamw-srx-cert",
+    "set services ssl initiation profile aamw-ssl actions crl disable",
+    "# [after enrollment] GeoIP object and the deny on the WAN path (paper 5.1, 8 step 9)",
+    "set security dynamic-address address-name GEO-DE profile category GeoIP property country string DE",
+    "set security policies from-zone IOT to-zone wan policy GEO-BLOCK-DE match source-address any",
+    "set security policies from-zone IOT to-zone wan policy GEO-BLOCK-DE match destination-address GEO-DE",
+    "set security policies from-zone IOT to-zone wan policy GEO-BLOCK-DE match application any",
+    "set security policies from-zone IOT to-zone wan policy GEO-BLOCK-DE then deny",
+    "set security policies from-zone IOT to-zone wan policy GEO-BLOCK-DE then count",
+    "# [after enrollment] re-set Mist's 01_Internet below GEO-BLOCK-DE (set and delete only, no insert)",
+    "delete security policies from-zone IOT to-zone wan policy 01_Internet",
+    "set security policies from-zone IOT to-zone wan policy 01_Internet match source-address 10-10-60-0_24",
+    "set security policies from-zone IOT to-zone wan policy 01_Internet match destination-address any",
+    "set security policies from-zone IOT to-zone wan policy 01_Internet match application any",
+    "set security policies from-zone IOT to-zone wan policy 01_Internet match dynamic-application any",
+    "set security policies from-zone IOT to-zone wan policy 01_Internet then permit"
+  ]
+}

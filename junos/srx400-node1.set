@@ -1,0 +1,681 @@
+# SRX400 node 1 (MNHA local-id 1, SRG1 activeness-priority 200, ISP 1) - configuration in display set form
+# Reference for the paper "SRX400 MNHA Secure Branch Design": the lab's as-built running configuration of the
+#   Hub Profile build (15 Oct 2026, after the Mist commit) with the generic values substituted (the paper's
+#   names and addresses, the generic tenant plan, placeholders). It is not a verbatim capture and not a Mist
+#   render of the files in mist/.
+# Per-tenant blocks that the capture listed in the order of the network names are listed in the order of
+#   the generic names (CORP, GUEST, IOT, MEDIA, MGMT, SECURITY), and the WAN-VR tenant discard routes in
+#   prefix order, as Junos lists static routes; other blocks keep the captured order.
+# Release: Junos OS Evolved 25.4X300-D30 (README, Release).
+# Produced in the lab by: Mist org objects + Hub Profile native settings (rendered by Mist) + Additional
+#   CLI. Their generic form: mist/org/, mist/hub-profiles/srx400-node1.json (Hub Profile SRX400-1) and
+#   mist/additional-cli/srx400-node1.txt.
+#   The PKI and SSL lines for ATP Cloud (aamw-*) are written on the box by ATP Cloud enrollment (paper 3.1, 5.2).
+# Derived, not captured: the address-book entry 10-200-0-0_16 and the two destination-address lines that use it
+#   (policy 01_allow-to-hub, group apbr) follow Mist's naming for the 10.200.0.0/16 application; the lab
+#   application listed several hub-site prefixes.
+# Not shown: the lines Mist writes at adoption (user mist, outbound-ssh to the Mist cloud, group mist-script,
+#   scripts, extensions, ephemeral database), certificates and keys, DHCP host reservations, management
+#   access settings and the "set version" line (README, What these files leave out).
+# Present and LAB ONLY (README, LAB ONLY): WAN-VR holding the WAN port ge-0/0/2, and the inet.0 default
+#   0.0.0.0/0 qualified-next-hop <mgmt-gateway> preference 1.
+# Placeholders (replace before use): <cloud>, <hub-MAC>, <mgmt-gateway>, <NODE1-MGMT-IP>, <NTP-SERVER>, <region>, <ROOT-PASSWORD-HASH>
+set groups wan
+set groups lan
+set groups apbr security advance-policy-based-routing profile IOT rule 01 match dynamic-application any
+set groups apbr security advance-policy-based-routing profile IOT rule 01 then routing-instance apbr_OrgOverlay
+set groups apbr security advance-policy-based-routing profile MGMT rule 01 match dynamic-application any
+set groups apbr security advance-policy-based-routing profile MGMT rule 01 then routing-instance apbr_wan
+set groups apbr security advance-policy-based-routing profile CORP rule 01 match dynamic-application any
+set groups apbr security advance-policy-based-routing profile CORP rule 01 then routing-instance apbr_wan
+set groups apbr security advance-policy-based-routing profile GUEST rule 01 match dynamic-application any
+set groups apbr security advance-policy-based-routing profile GUEST rule 01 then routing-instance apbr_wan
+set groups apbr security advance-policy-based-routing profile MEDIA rule 01 match dynamic-application any
+set groups apbr security advance-policy-based-routing profile MEDIA rule 01 then routing-instance apbr_wan
+set groups apbr security advance-policy-based-routing profile SECURITY rule 01 match dynamic-application any
+set groups apbr security advance-policy-based-routing profile SECURITY rule 01 then routing-instance apbr_wan
+set groups apbr security advance-policy-based-routing profile IOT_001 rule 01 match dynamic-application any
+set groups apbr security advance-policy-based-routing profile IOT_001 rule 01 then routing-instance apbr_wan
+set groups apbr security advance-policy-based-routing from-zone IOT policy 01 match source-address 10-10-60-0_24
+set groups apbr security advance-policy-based-routing from-zone IOT policy 01 match destination-address 10-200-0-0_16
+set groups apbr security advance-policy-based-routing from-zone IOT policy 01 match application any
+set groups apbr security advance-policy-based-routing from-zone IOT policy 01 then application-services advance-policy-based-routing-profile IOT
+set groups apbr security advance-policy-based-routing from-zone IOT policy 02 match source-address 10-10-60-0_24
+set groups apbr security advance-policy-based-routing from-zone IOT policy 02 match destination-address any
+set groups apbr security advance-policy-based-routing from-zone IOT policy 02 match application any
+set groups apbr security advance-policy-based-routing from-zone IOT policy 02 then application-services advance-policy-based-routing-profile IOT_001
+set groups apbr security advance-policy-based-routing from-zone MGMT policy 01 match source-address 10-10-10-0_24
+set groups apbr security advance-policy-based-routing from-zone MGMT policy 01 match destination-address any
+set groups apbr security advance-policy-based-routing from-zone MGMT policy 01 match application any
+set groups apbr security advance-policy-based-routing from-zone MGMT policy 01 then application-services advance-policy-based-routing-profile MGMT
+set groups apbr security advance-policy-based-routing from-zone CORP policy 01 match source-address 10-10-20-0_24
+set groups apbr security advance-policy-based-routing from-zone CORP policy 01 match destination-address any
+set groups apbr security advance-policy-based-routing from-zone CORP policy 01 match application any
+set groups apbr security advance-policy-based-routing from-zone CORP policy 01 then application-services advance-policy-based-routing-profile CORP
+set groups apbr security advance-policy-based-routing from-zone GUEST policy 01 match source-address 10-10-30-0_24
+set groups apbr security advance-policy-based-routing from-zone GUEST policy 01 match destination-address any
+set groups apbr security advance-policy-based-routing from-zone GUEST policy 01 match application any
+set groups apbr security advance-policy-based-routing from-zone GUEST policy 01 then application-services advance-policy-based-routing-profile GUEST
+set groups apbr security advance-policy-based-routing from-zone MEDIA policy 01 match source-address 10-10-40-0_24
+set groups apbr security advance-policy-based-routing from-zone MEDIA policy 01 match destination-address any
+set groups apbr security advance-policy-based-routing from-zone MEDIA policy 01 match application any
+set groups apbr security advance-policy-based-routing from-zone MEDIA policy 01 then application-services advance-policy-based-routing-profile MEDIA
+set groups apbr security advance-policy-based-routing from-zone SECURITY policy 01 match source-address 10-10-50-0_24
+set groups apbr security advance-policy-based-routing from-zone SECURITY policy 01 match destination-address any
+set groups apbr security advance-policy-based-routing from-zone SECURITY policy 01 match application any
+set groups apbr security advance-policy-based-routing from-zone SECURITY policy 01 then application-services advance-policy-based-routing-profile SECURITY
+set groups top system name-server 8.8.8.8
+set groups top system name-server 1.1.1.1
+set groups top system ntp server <NTP-SERVER>
+set groups top services monitoring rpm owner wan test wan_ping probe-type icmp-ping
+set groups top services monitoring rpm owner wan test wan_ping offload-type pfe-timestamp
+set groups top services monitoring rpm owner wan test wan_ping target 8.8.8.8
+set groups top services monitoring rpm owner wan test wan_ping probe-count 3
+set groups top services monitoring rpm owner wan test wan_ping probe-interval 5
+set groups top services monitoring rpm owner wan test wan_ping test-interval 30
+set groups top services monitoring rpm owner wan test wan_ping thresholds successive-loss 2
+set groups top services monitoring rpm owner wan test wan_ping thresholds total-loss 2
+set groups top services monitoring rpm owner OrgOverlay_wan test st0.0 probe-type icmp-ping
+set groups top services monitoring rpm owner OrgOverlay_wan test st0.0 offload-type none
+set groups top services monitoring rpm owner OrgOverlay_wan test st0.0 target 100.65.0.1
+set groups top services monitoring rpm owner OrgOverlay_wan test st0.0 routing-instance vpn_OrgOverlay
+set groups top services monitoring rpm owner OrgOverlay_wan test st0.0 probe-count 5
+set groups top services monitoring rpm owner OrgOverlay_wan test st0.0 probe-interval 1
+set groups top services monitoring rpm owner OrgOverlay_wan test st0.0 test-interval 60
+set groups top interfaces lo0 unit 0 family inet address 100.100.0.1/32
+set groups top forwarding-options storm-control-profiles default all
+set groups top policy-options policy-statement ecmp_policy then load-balance per-packet
+set groups top policy-options policy-statement ecmp_policy then accept
+set groups top policy-options policy-statement lan_direct term 01_direct from instance lan
+set groups top policy-options policy-statement lan_direct term 01_direct from protocol direct
+set groups top policy-options policy-statement lan_direct term 01_direct then accept
+set groups top policy-options policy-statement lan_direct term 02_not_direct from instance lan
+set groups top policy-options policy-statement lan_direct term 02_not_direct then reject
+set groups top policy-options policy-statement master_direct term 01_direct from instance master
+set groups top policy-options policy-statement master_direct term 01_direct from protocol direct
+set groups top policy-options policy-statement master_direct term 01_direct then accept
+set groups top policy-options policy-statement vpn_OrgOverlay_bgp term 01_bgp from instance vpn_OrgOverlay
+set groups top policy-options policy-statement vpn_OrgOverlay_bgp term 01_bgp from protocol bgp
+set groups top policy-options policy-statement vpn_OrgOverlay_bgp term 01_bgp then accept
+set groups top policy-options policy-statement vpn_OrgOverlay_bgp term 02_not_bgp from instance vpn_OrgOverlay
+set groups top policy-options policy-statement vpn_OrgOverlay_bgp term 02_not_bgp then reject
+set groups top policy-options policy-statement vpn_OrgOverlay_direct term 01_direct from instance vpn_OrgOverlay
+set groups top policy-options policy-statement vpn_OrgOverlay_direct term 01_direct from protocol direct
+set groups top policy-options policy-statement vpn_OrgOverlay_direct term 01_direct then accept
+set groups top policy-options policy-statement vpn_OrgOverlay_direct term 02_not_direct from instance vpn_OrgOverlay
+set groups top policy-options policy-statement vpn_OrgOverlay_direct term 02_not_direct then reject
+set groups top policy-options policy-statement OrgOverlay_advertise term 01_IOT_direct from protocol direct
+set groups top policy-options policy-statement OrgOverlay_advertise term 01_IOT_direct from interface ge-0/0/3.60
+set groups top policy-options policy-statement OrgOverlay_advertise term 01_IOT_direct then community add IOT_community
+set groups top policy-options policy-statement OrgOverlay_advertise term 01_IOT_direct then accept
+set groups top policy-options policy-statement wan_default term 01_wan_default from instance master
+set groups top policy-options policy-statement wan_default term 01_wan_default from route-filter 0.0.0.0/0 exact
+set groups top policy-options policy-statement wan_default term 01_wan_default then accept
+set groups top policy-options policy-statement wan_default term 02_wan_local from instance master
+set groups top policy-options policy-statement wan_default term 02_wan_local from protocol local
+set groups top policy-options policy-statement wan_default term 02_wan_local to rib inet.0
+set groups top policy-options policy-statement wan_default term 02_wan_local then accept
+set groups top policy-options policy-statement wan_default term 03_wan_cleanup from instance master
+set groups top policy-options policy-statement wan_default term 03_wan_cleanup from protocol direct
+set groups top policy-options policy-statement wan_default term 03_wan_cleanup from protocol local
+set groups top policy-options policy-statement wan_default term 03_wan_cleanup then reject
+set groups top policy-options policy-statement apbr_wan_wan term 01_wan_default from instance master
+set groups top policy-options policy-statement apbr_wan_wan term 01_wan_default from route-filter 0.0.0.0/0 exact
+set groups top policy-options policy-statement apbr_wan_wan term 01_wan_default then preference 200
+set groups top policy-options policy-statement apbr_wan_wan term 01_wan_default then accept
+set groups top policy-options policy-statement apbr_wan_wan term 02_wan_cleanup from instance master
+set groups top policy-options policy-statement apbr_wan_wan term 02_wan_cleanup from protocol direct
+set groups top policy-options policy-statement apbr_wan_wan term 02_wan_cleanup from protocol local
+set groups top policy-options policy-statement apbr_wan_wan term 02_wan_cleanup then reject
+set groups top policy-options policy-statement apbr_OrgOverlay_bgp term 01_otherwise from instance vpn_OrgOverlay
+set groups top policy-options policy-statement apbr_OrgOverlay_bgp term 01_otherwise then reject
+set groups top policy-options community IOT_community members origin:100.99.254.0:1
+set groups top policy-options condition st0.0_up if-route-exists address-family inet 100.99.254.0/32
+set groups top policy-options condition st0.0_up if-route-exists address-family inet table vpn_OrgOverlay.inet.0
+set groups top routing-instances lan instance-type virtual-router
+set groups top routing-instances lan routing-options instance-import vpn_OrgOverlay_bgp
+set groups top routing-instances lan system services dhcp-local-server group CORP interface ge-0/0/3.20
+set groups top routing-instances lan system services dhcp-local-server group IOT interface ge-0/0/3.60
+set groups top routing-instances lan system services dhcp-local-server group MEDIA interface ge-0/0/3.40
+set groups top routing-instances lan system services dhcp-local-server group MGMT interface ge-0/0/3.0
+set groups top routing-instances lan system services dhcp-local-server group SECURITY interface ge-0/0/3.50
+set groups top routing-instances lan system services dhcp-local-server requested-ip-interface-match
+set groups top routing-instances lan access address-assignment pool CORP family inet network 10.10.20.0/24
+set groups top routing-instances lan access address-assignment pool CORP family inet range CORP low 10.10.20.10
+set groups top routing-instances lan access address-assignment pool CORP family inet range CORP high 10.10.20.200
+set groups top routing-instances lan access address-assignment pool CORP family inet dhcp-attributes name-server 8.8.8.8
+set groups top routing-instances lan access address-assignment pool CORP family inet dhcp-attributes name-server 1.1.1.1
+set groups top routing-instances lan access address-assignment pool CORP family inet dhcp-attributes router 10.10.20.1
+set groups top routing-instances lan access address-assignment pool IOT family inet network 10.10.60.0/24
+set groups top routing-instances lan access address-assignment pool IOT family inet range IOT low 10.10.60.10
+set groups top routing-instances lan access address-assignment pool IOT family inet range IOT high 10.10.60.200
+set groups top routing-instances lan access address-assignment pool IOT family inet dhcp-attributes name-server 8.8.8.8
+set groups top routing-instances lan access address-assignment pool IOT family inet dhcp-attributes name-server 1.1.1.1
+set groups top routing-instances lan access address-assignment pool IOT family inet dhcp-attributes router 10.10.60.1
+set groups top routing-instances lan access address-assignment pool MEDIA family inet network 10.10.40.0/24
+set groups top routing-instances lan access address-assignment pool MEDIA family inet range MEDIA low 10.10.40.10
+set groups top routing-instances lan access address-assignment pool MEDIA family inet range MEDIA high 10.10.40.200
+set groups top routing-instances lan access address-assignment pool MEDIA family inet dhcp-attributes name-server 8.8.8.8
+set groups top routing-instances lan access address-assignment pool MEDIA family inet dhcp-attributes name-server 1.1.1.1
+set groups top routing-instances lan access address-assignment pool MEDIA family inet dhcp-attributes router 10.10.40.1
+set groups top routing-instances lan access address-assignment pool MGMT family inet network 10.10.10.0/24
+set groups top routing-instances lan access address-assignment pool MGMT family inet range MGMT low 10.10.10.10
+set groups top routing-instances lan access address-assignment pool MGMT family inet range MGMT high 10.10.10.200
+set groups top routing-instances lan access address-assignment pool MGMT family inet dhcp-attributes name-server 1.1.1.1
+set groups top routing-instances lan access address-assignment pool MGMT family inet dhcp-attributes name-server 8.8.8.8
+set groups top routing-instances lan access address-assignment pool MGMT family inet dhcp-attributes router 10.10.10.1
+set groups top routing-instances lan access address-assignment pool SECURITY family inet network 10.10.50.0/24
+set groups top routing-instances lan access address-assignment pool SECURITY family inet range SECURITY low 10.10.50.10
+set groups top routing-instances lan access address-assignment pool SECURITY family inet range SECURITY high 10.10.50.200
+set groups top routing-instances lan access address-assignment pool SECURITY family inet dhcp-attributes name-server 8.8.8.8
+set groups top routing-instances lan access address-assignment pool SECURITY family inet dhcp-attributes name-server 1.1.1.1
+set groups top routing-instances lan access address-assignment pool SECURITY family inet dhcp-attributes router 10.10.50.1
+set groups top routing-instances lan interface ge-0/0/3.20
+set groups top routing-instances lan interface ge-0/0/3.60
+set groups top routing-instances lan interface ge-0/0/3.40
+set groups top routing-instances lan interface ge-0/0/3.0
+set groups top routing-instances lan interface ge-0/0/3.50
+set groups top routing-instances vpn_OrgOverlay instance-type virtual-router
+set groups top routing-instances vpn_OrgOverlay routing-options static route 100.101.0.4/32 next-hop 100.65.0.1
+set groups top routing-instances vpn_OrgOverlay routing-options static route 100.101.0.4/32 no-resolve
+set groups top routing-instances vpn_OrgOverlay routing-options static route 100.99.254.0/32 next-hop 100.65.0.1
+set groups top routing-instances vpn_OrgOverlay routing-options instance-import lan_direct
+set groups top routing-instances vpn_OrgOverlay routing-options instance-import master_direct
+set groups top routing-instances vpn_OrgOverlay protocols bgp group OrgOverlay_overlay type internal
+set groups top routing-instances vpn_OrgOverlay protocols bgp group OrgOverlay_overlay local-address 100.101.0.1
+set groups top routing-instances vpn_OrgOverlay protocols bgp group OrgOverlay_overlay log-updown
+set groups top routing-instances vpn_OrgOverlay protocols bgp group OrgOverlay_overlay bgp-error-tolerance malformed-route-limit 1
+set groups top routing-instances vpn_OrgOverlay protocols bgp group OrgOverlay_overlay export OrgOverlay_advertise
+set groups top routing-instances vpn_OrgOverlay protocols bgp group OrgOverlay_overlay neighbor 100.101.0.4
+set groups top routing-instances vpn_OrgOverlay interface lo0.1
+set groups top routing-instances vpn_OrgOverlay interface st0.0
+set groups top routing-instances apbr_wan instance-type forwarding
+set groups top routing-instances apbr_wan routing-options instance-import apbr_wan_wan
+set groups top routing-instances apbr_OrgOverlay instance-type forwarding
+set groups top routing-instances apbr_OrgOverlay routing-options static route 0.0.0.0/0 next-hop 100.65.0.1
+set groups top routing-instances apbr_OrgOverlay routing-options static route 0.0.0.0/0 preference 200
+set groups top routing-instances apbr_OrgOverlay routing-options instance-import vpn_OrgOverlay_direct
+set groups top applications application tcp_443 protocol tcp
+set groups top applications application tcp_443 destination-port 443
+set groups top applications application tcp_2200 protocol tcp
+set groups top applications application tcp_2200 destination-port 2200
+set groups top applications application tcp_6514 protocol tcp
+set groups top applications application tcp_6514 destination-port 6514
+set groups top applications application tcp_2083 protocol tcp
+set groups top applications application tcp_2083 destination-port 2083
+set groups top routing-options router-id 100.100.0.1
+set groups top routing-options autonomous-system 65000
+set groups top routing-options instance-import lan_direct
+set groups top routing-options forwarding-table export ecmp_policy
+set groups MNHA-NODE-LOCAL security ike gateway <*> node-local
+set apply-groups top
+set apply-groups MNHA-NODE-LOCAL
+set system host-name SRX400-1
+set system root-authentication encrypted-password "<ROOT-PASSWORD-HASH>"
+set system syslog archive size 1m
+set system syslog archive files 10
+set system syslog file escript.log archive size 2m
+set system syslog file escript.log archive files 5
+set system syslog file interactive-commands interactive-commands any
+set system syslog file interactive-commands match "!(.*mist.*)"
+set system syslog file interactive-commands archive size 2m
+set system syslog file interactive-commands archive files 5
+set system syslog file messages any notice
+set system syslog file messages authorization info
+set system syslog file op-script.log archive size 2m
+set system syslog file op-script.log archive files 5
+set system syslog file snapshot archive size 2m
+set system syslog file snapshot archive files 5
+set system services netconf ssh
+set system services ssh protocol-version v2
+set system time-zone UTC
+set system processes dhcp-service accept-max-tcp-connections 100
+set system processes dhcp-service request-max-tcp-connections 100
+set system processes dhcp-service max-leasequery-reply-packet-retries 40
+set system processes dhcp-service leasequery-reply-packet-retry-timer 20
+set system processes dhcp-service max-leasequery-reply-packet-process 500
+set chassis high-availability local-id 1
+set chassis high-availability local-id local-ip 10.255.0.1
+set chassis high-availability local-id local-forwarding-ip 10.255.1.1
+set chassis high-availability peer-id 2 peer-ip 10.255.0.2
+set chassis high-availability peer-id 2 interface ge-0/0/4.0
+set chassis high-availability peer-id 2 peer-forwarding-ip 10.255.1.2
+set chassis high-availability peer-id 2 peer-forwarding-ip interface ge-0/0/4.0
+set chassis high-availability peer-id 2 peer-forwarding-ip liveness-detection minimum-interval 1000
+set chassis high-availability peer-id 2 peer-forwarding-ip liveness-detection multiplier 3
+set chassis high-availability peer-id 2 liveness-detection minimum-interval 1000
+set chassis high-availability peer-id 2 liveness-detection multiplier 3
+set chassis high-availability services-redundancy-group 1 deployment-type hybrid
+set chassis high-availability services-redundancy-group 1 peer-id 2
+set chassis high-availability services-redundancy-group 1 virtual-ip 1 ip 10.10.10.1/24
+set chassis high-availability services-redundancy-group 1 virtual-ip 1 interface ge-0/0/3.0
+set chassis high-availability services-redundancy-group 1 virtual-ip 1 use-virtual-mac
+set chassis high-availability services-redundancy-group 1 virtual-ip 2 ip 10.10.20.1/24
+set chassis high-availability services-redundancy-group 1 virtual-ip 2 interface ge-0/0/3.20
+set chassis high-availability services-redundancy-group 1 virtual-ip 2 use-virtual-mac
+set chassis high-availability services-redundancy-group 1 virtual-ip 3 ip 10.10.30.1/24
+set chassis high-availability services-redundancy-group 1 virtual-ip 3 interface ge-0/0/3.30
+set chassis high-availability services-redundancy-group 1 virtual-ip 3 use-virtual-mac
+set chassis high-availability services-redundancy-group 1 virtual-ip 4 ip 10.10.40.1/24
+set chassis high-availability services-redundancy-group 1 virtual-ip 4 interface ge-0/0/3.40
+set chassis high-availability services-redundancy-group 1 virtual-ip 4 use-virtual-mac
+set chassis high-availability services-redundancy-group 1 virtual-ip 5 ip 10.10.50.1/24
+set chassis high-availability services-redundancy-group 1 virtual-ip 5 interface ge-0/0/3.50
+set chassis high-availability services-redundancy-group 1 virtual-ip 5 use-virtual-mac
+set chassis high-availability services-redundancy-group 1 virtual-ip 6 ip 10.10.60.1/24
+set chassis high-availability services-redundancy-group 1 virtual-ip 6 interface ge-0/0/3.60
+set chassis high-availability services-redundancy-group 1 virtual-ip 6 use-virtual-mac
+set chassis high-availability services-redundancy-group 1 monitor interface ge-0/0/3
+set chassis high-availability services-redundancy-group 1 active-signal-route 10.255.3.1
+set chassis high-availability services-redundancy-group 1 backup-signal-route 10.255.3.2
+set chassis high-availability services-redundancy-group 1 managed-services dhcp
+set chassis high-availability services-redundancy-group 1 activeness-priority 200
+set services advanced-anti-malware connection url https://srxapi-v2.<region>.sky.junipersecurity.net
+set services advanced-anti-malware connection authentication tls-profile aamw-ssl
+set services security-intelligence url https://cloudfeeds-v2.sky.junipersecurity.net/api/manifest.xml
+set services security-intelligence authentication tls-profile aamw-ssl
+set services ssl initiation profile aamw-ssl trusted-ca aamw-secintel-ca
+set services ssl initiation profile aamw-ssl trusted-ca aamw-cloud-ca
+set services ssl initiation profile aamw-ssl client-certificate aamw-srx-cert
+set services ssl initiation profile aamw-ssl actions crl disable
+set security pki ca-profile mist-vpn-ca ca-identity mist-vpn-ca
+set security pki ca-profile mist-vpn-ca revocation-check use-crl
+set security pki ca-profile mist-vpn-ca revocation-check crl disable on-download-failure
+set security pki ca-profile mist-vpn-ca revocation-check crl refresh-interval 0
+set security pki ca-profile aamw-ca ca-identity ATPCloudForSRXCA
+set security pki ca-profile aamw-ca enrollment url https://ca.junipersecurity.net/ejbca/publicweb/apply/scep/ATPSRX/pkiclient.exe
+set security pki ca-profile aamw-ca revocation-check disable
+set security pki ca-profile aamw-ca revocation-check crl url https://va.junipersecurity.net/ca/atpcloud/ATPCloudForSRXCA.crl
+set security pki ca-profile aamw-secintel-ca ca-identity JUNIPER
+set security pki ca-profile aamw-secintel-ca revocation-check crl url https://va.junipersecurity.net/ca/atpcloud/current.crl
+set security pki ca-profile aamw-cloud-ca ca-identity JUNIPER_CLOUD
+set security pki ca-profile aamw-cloud-ca revocation-check crl url https://va.junipersecurity.net/ca/atpcloud/ATPCloudForCloudCA.crl
+set security ike proposal OrgOverlay authentication-method rsa-signatures
+set security ike proposal OrgOverlay dh-group group14
+set security ike proposal OrgOverlay encryption-algorithm aes-256-gcm
+set security ike proposal OrgOverlay lifetime-seconds 3600
+set security ike policy OrgOverlay_wan mode main
+set security ike policy OrgOverlay_wan proposals OrgOverlay
+set security ike policy OrgOverlay_wan certificate local-certificate mist-vpn-cert-1
+set security ike gateway wan_to_<hub-MAC>_wan ike-policy OrgOverlay_wan
+set security ike gateway wan_to_<hub-MAC>_wan address 172.16.11.2
+set security ike gateway wan_to_<hub-MAC>_wan dead-peer-detection always-send
+set security ike gateway wan_to_<hub-MAC>_wan dead-peer-detection interval 3
+set security ike gateway wan_to_<hub-MAC>_wan dead-peer-detection threshold 3
+set security ike gateway wan_to_<hub-MAC>_wan local-identity distinguished-name
+set security ike gateway wan_to_<hub-MAC>_wan remote-identity distinguished-name
+set security ike gateway wan_to_<hub-MAC>_wan external-interface ge-0/0/2.0
+set security ike gateway wan_to_<hub-MAC>_wan version v2-only
+set security ipsec proposal OrgOverlay protocol esp
+set security ipsec proposal OrgOverlay encryption-algorithm aes-256-gcm
+set security ipsec proposal OrgOverlay lifetime-seconds 1800
+set security ipsec policy OrgOverlay proposals OrgOverlay
+set security ipsec vpn wan_to_<hub-MAC>_wan bind-interface st0.0
+set security ipsec vpn wan_to_<hub-MAC>_wan df-bit copy
+set security ipsec vpn wan_to_<hub-MAC>_wan ike gateway wan_to_<hub-MAC>_wan
+set security ipsec vpn wan_to_<hub-MAC>_wan ike proxy-identity local 1.0.0.251/32
+set security ipsec vpn wan_to_<hub-MAC>_wan ike proxy-identity remote 1.0.0.1/32
+set security ipsec vpn wan_to_<hub-MAC>_wan ike ipsec-policy OrgOverlay
+set security ipsec vpn wan_to_<hub-MAC>_wan establish-tunnels immediately
+set security address-book global address api-ws.<cloud>.mist.com dns-name api-ws.<cloud>.mist.com
+set security address-book global address api.<cloud>.mist.com dns-name api.<cloud>.mist.com
+set security address-book global address cdn.juniper.net dns-name cdn.juniper.net
+set security address-book global address ep-terminator.<cloud>.mist.com dns-name ep-terminator.<cloud>.mist.com
+set security address-book global address ep-terminator.mistsys.net dns-name ep-terminator.mistsys.net
+set security address-book global address jma-terminator.<cloud>.mist.com dns-name jma-terminator.<cloud>.mist.com
+set security address-book global address manage.<cloud>.mist.com dns-name manage.<cloud>.mist.com
+set security address-book global address oc-term.<cloud>.mist.com dns-name oc-term.<cloud>.mist.com
+set security address-book global address portal.<cloud>.mist.com dns-name portal.<cloud>.mist.com
+set security address-book global address radsec.nac.mist.com dns-name radsec.nac.mist.com
+set security address-book global address redirect.juniper.net dns-name redirect.juniper.net
+set security address-book global address srx-log-terminator.<cloud>.mist.com dns-name srx-log-terminator.<cloud>.mist.com
+set security address-book global address ztp.<cloud>.mist.com dns-name ztp.<cloud>.mist.com
+set security address-book global address 10-10-60-0_24 10.10.60.0/24
+set security address-book global address 10-200-0-0_16 10.200.0.0/16
+set security address-book global address 10-10-10-0_24 10.10.10.0/24
+set security address-book global address 10-10-20-0_24 10.10.20.0/24
+set security address-book global address 10-10-30-0_24 10.10.30.0/24
+set security address-book global address 10-10-40-0_24 10.10.40.0/24
+set security address-book global address 10-10-50-0_24 10.10.50.0/24
+set security dynamic-address address-name GEO-DE profile category GeoIP property country string DE
+set security flow tcp-mss ipsec-vpn mss 1350
+set security screen ids-option untrust-screen icmp ping-death
+set security screen ids-option untrust-screen ip source-route-option
+set security screen ids-option untrust-screen ip tear-drop
+set security screen ids-option untrust-screen tcp syn-flood alarm-threshold 1024
+set security screen ids-option untrust-screen tcp syn-flood attack-threshold 200
+set security screen ids-option untrust-screen tcp syn-flood source-threshold 1024
+set security screen ids-option untrust-screen tcp syn-flood destination-threshold 2048
+set security screen ids-option untrust-screen tcp syn-flood timeout 20
+set security screen ids-option untrust-screen tcp land
+set security nat source rule-set host_to_wan from zone junos-host
+set security nat source rule-set host_to_wan to zone wan
+set security nat source rule-set host_to_wan rule host_to_wan match source-address 0.0.0.0/0
+set security nat source rule-set host_to_wan rule host_to_wan then source-nat interface
+set security nat source rule-set CORP_to_wan from zone CORP
+set security nat source rule-set CORP_to_wan to zone wan
+set security nat source rule-set CORP_to_wan rule CORP_to_wan match source-address 0.0.0.0/0
+set security nat source rule-set CORP_to_wan rule CORP_to_wan then source-nat interface
+set security nat source rule-set GUEST_to_wan from zone GUEST
+set security nat source rule-set GUEST_to_wan to zone wan
+set security nat source rule-set GUEST_to_wan rule GUEST_to_wan match source-address 0.0.0.0/0
+set security nat source rule-set GUEST_to_wan rule GUEST_to_wan then source-nat interface
+set security nat source rule-set IOT_to_wan from zone IOT
+set security nat source rule-set IOT_to_wan to zone wan
+set security nat source rule-set IOT_to_wan rule IOT_to_wan match source-address 0.0.0.0/0
+set security nat source rule-set IOT_to_wan rule IOT_to_wan then source-nat interface
+set security nat source rule-set MEDIA_to_wan from zone MEDIA
+set security nat source rule-set MEDIA_to_wan to zone wan
+set security nat source rule-set MEDIA_to_wan rule MEDIA_to_wan match source-address 0.0.0.0/0
+set security nat source rule-set MEDIA_to_wan rule MEDIA_to_wan then source-nat interface
+set security nat source rule-set MGMT_to_wan from zone MGMT
+set security nat source rule-set MGMT_to_wan to zone wan
+set security nat source rule-set MGMT_to_wan rule MGMT_to_wan match source-address 0.0.0.0/0
+set security nat source rule-set MGMT_to_wan rule MGMT_to_wan then source-nat interface
+set security nat source rule-set SECURITY_to_wan from zone SECURITY
+set security nat source rule-set SECURITY_to_wan to zone wan
+set security nat source rule-set SECURITY_to_wan rule SECURITY_to_wan match source-address 0.0.0.0/0
+set security nat source rule-set SECURITY_to_wan rule SECURITY_to_wan then source-nat interface
+set security nat source rule-set ICD_to_wan from zone ICD
+set security nat source rule-set ICD_to_wan to zone wan
+set security nat source rule-set ICD_to_wan rule xnode match source-address 0.0.0.0/0
+set security nat source rule-set ICD_to_wan rule xnode then source-nat interface
+set security policies from-zone CORP to-zone CORP policy same_zone match source-address any
+set security policies from-zone CORP to-zone CORP policy same_zone match destination-address any
+set security policies from-zone CORP to-zone CORP policy same_zone match application any
+set security policies from-zone CORP to-zone CORP policy same_zone then permit
+set security policies from-zone GUEST to-zone GUEST policy same_zone match source-address any
+set security policies from-zone GUEST to-zone GUEST policy same_zone match destination-address any
+set security policies from-zone GUEST to-zone GUEST policy same_zone match application any
+set security policies from-zone GUEST to-zone GUEST policy same_zone then permit
+set security policies from-zone IOT to-zone IOT policy same_zone match source-address any
+set security policies from-zone IOT to-zone IOT policy same_zone match destination-address any
+set security policies from-zone IOT to-zone IOT policy same_zone match application any
+set security policies from-zone IOT to-zone IOT policy same_zone then permit
+set security policies from-zone MEDIA to-zone MEDIA policy same_zone match source-address any
+set security policies from-zone MEDIA to-zone MEDIA policy same_zone match destination-address any
+set security policies from-zone MEDIA to-zone MEDIA policy same_zone match application any
+set security policies from-zone MEDIA to-zone MEDIA policy same_zone then permit
+set security policies from-zone MGMT to-zone MGMT policy same_zone match source-address any
+set security policies from-zone MGMT to-zone MGMT policy same_zone match destination-address any
+set security policies from-zone MGMT to-zone MGMT policy same_zone match application any
+set security policies from-zone MGMT to-zone MGMT policy same_zone then permit
+set security policies from-zone SECURITY to-zone SECURITY policy same_zone match source-address any
+set security policies from-zone SECURITY to-zone SECURITY policy same_zone match destination-address any
+set security policies from-zone SECURITY to-zone SECURITY policy same_zone match application any
+set security policies from-zone SECURITY to-zone SECURITY policy same_zone then permit
+set security policies from-zone vpn_OrgOverlay to-zone vpn_OrgOverlay policy same_zone match source-address any
+set security policies from-zone vpn_OrgOverlay to-zone vpn_OrgOverlay policy same_zone match destination-address any
+set security policies from-zone vpn_OrgOverlay to-zone vpn_OrgOverlay policy same_zone match application any
+set security policies from-zone vpn_OrgOverlay to-zone vpn_OrgOverlay policy same_zone then permit
+set security policies from-zone IOT to-zone vpn_OrgOverlay policy 01_allow-to-hub match source-address 10-10-60-0_24
+set security policies from-zone IOT to-zone vpn_OrgOverlay policy 01_allow-to-hub match destination-address 10-200-0-0_16
+set security policies from-zone IOT to-zone vpn_OrgOverlay policy 01_allow-to-hub match application any
+set security policies from-zone IOT to-zone vpn_OrgOverlay policy 01_allow-to-hub match dynamic-application any
+set security policies from-zone IOT to-zone vpn_OrgOverlay policy 01_allow-to-hub then permit
+set security policies from-zone MGMT to-zone wan policy 01_Internet match source-address 10-10-10-0_24
+set security policies from-zone MGMT to-zone wan policy 01_Internet match destination-address any
+set security policies from-zone MGMT to-zone wan policy 01_Internet match application any
+set security policies from-zone MGMT to-zone wan policy 01_Internet match dynamic-application any
+set security policies from-zone MGMT to-zone wan policy 01_Internet then permit
+set security policies from-zone CORP to-zone wan policy 01_Internet match source-address 10-10-20-0_24
+set security policies from-zone CORP to-zone wan policy 01_Internet match destination-address any
+set security policies from-zone CORP to-zone wan policy 01_Internet match application any
+set security policies from-zone CORP to-zone wan policy 01_Internet match dynamic-application any
+set security policies from-zone CORP to-zone wan policy 01_Internet then permit
+set security policies from-zone GUEST to-zone wan policy 01_Internet match source-address 10-10-30-0_24
+set security policies from-zone GUEST to-zone wan policy 01_Internet match destination-address any
+set security policies from-zone GUEST to-zone wan policy 01_Internet match application any
+set security policies from-zone GUEST to-zone wan policy 01_Internet match dynamic-application any
+set security policies from-zone GUEST to-zone wan policy 01_Internet then permit
+set security policies from-zone MEDIA to-zone wan policy 01_Internet match source-address 10-10-40-0_24
+set security policies from-zone MEDIA to-zone wan policy 01_Internet match destination-address any
+set security policies from-zone MEDIA to-zone wan policy 01_Internet match application any
+set security policies from-zone MEDIA to-zone wan policy 01_Internet match dynamic-application any
+set security policies from-zone MEDIA to-zone wan policy 01_Internet then permit
+set security policies from-zone SECURITY to-zone wan policy 01_Internet match source-address 10-10-50-0_24
+set security policies from-zone SECURITY to-zone wan policy 01_Internet match destination-address any
+set security policies from-zone SECURITY to-zone wan policy 01_Internet match application any
+set security policies from-zone SECURITY to-zone wan policy 01_Internet match dynamic-application any
+set security policies from-zone SECURITY to-zone wan policy 01_Internet then permit
+set security policies from-zone IOT to-zone wan policy GEO-BLOCK-DE match source-address any
+set security policies from-zone IOT to-zone wan policy GEO-BLOCK-DE match destination-address GEO-DE
+set security policies from-zone IOT to-zone wan policy GEO-BLOCK-DE match application any
+set security policies from-zone IOT to-zone wan policy GEO-BLOCK-DE then deny
+set security policies from-zone IOT to-zone wan policy GEO-BLOCK-DE then count
+set security policies from-zone IOT to-zone wan policy 01_Internet match source-address 10-10-60-0_24
+set security policies from-zone IOT to-zone wan policy 01_Internet match destination-address any
+set security policies from-zone IOT to-zone wan policy 01_Internet match application any
+set security policies from-zone IOT to-zone wan policy 01_Internet match dynamic-application any
+set security policies from-zone IOT to-zone wan policy 01_Internet then permit
+set security policies from-zone HA to-zone HA policy allow-ha match source-address any
+set security policies from-zone HA to-zone HA policy allow-ha match destination-address any
+set security policies from-zone HA to-zone HA policy allow-ha match application any
+set security policies from-zone HA to-zone HA policy allow-ha then permit
+set security policies from-zone MGMT to-zone ICD policy MGMT-xnode match source-address any
+set security policies from-zone MGMT to-zone ICD policy MGMT-xnode match destination-address any
+set security policies from-zone MGMT to-zone ICD policy MGMT-xnode match application any
+set security policies from-zone MGMT to-zone ICD policy MGMT-xnode then permit
+set security policies from-zone CORP to-zone ICD policy CORP-xnode match source-address any
+set security policies from-zone CORP to-zone ICD policy CORP-xnode match destination-address any
+set security policies from-zone CORP to-zone ICD policy CORP-xnode match application any
+set security policies from-zone CORP to-zone ICD policy CORP-xnode then permit
+set security policies from-zone GUEST to-zone ICD policy GUEST-xnode match source-address any
+set security policies from-zone GUEST to-zone ICD policy GUEST-xnode match destination-address any
+set security policies from-zone GUEST to-zone ICD policy GUEST-xnode match application any
+set security policies from-zone GUEST to-zone ICD policy GUEST-xnode then permit
+set security policies from-zone MEDIA to-zone ICD policy MEDIA-xnode match source-address any
+set security policies from-zone MEDIA to-zone ICD policy MEDIA-xnode match destination-address any
+set security policies from-zone MEDIA to-zone ICD policy MEDIA-xnode match application any
+set security policies from-zone MEDIA to-zone ICD policy MEDIA-xnode then permit
+set security policies from-zone SECURITY to-zone ICD policy SECURITY-xnode match source-address any
+set security policies from-zone SECURITY to-zone ICD policy SECURITY-xnode match destination-address any
+set security policies from-zone SECURITY to-zone ICD policy SECURITY-xnode match application any
+set security policies from-zone SECURITY to-zone ICD policy SECURITY-xnode then permit
+set security policies from-zone IOT to-zone ICD policy GEO-BLOCK-DE match source-address any
+set security policies from-zone IOT to-zone ICD policy GEO-BLOCK-DE match destination-address GEO-DE
+set security policies from-zone IOT to-zone ICD policy GEO-BLOCK-DE match application any
+set security policies from-zone IOT to-zone ICD policy GEO-BLOCK-DE then deny
+set security policies from-zone IOT to-zone ICD policy GEO-BLOCK-DE then count
+set security policies from-zone IOT to-zone ICD policy IOT-xnode match source-address any
+set security policies from-zone IOT to-zone ICD policy IOT-xnode match destination-address any
+set security policies from-zone IOT to-zone ICD policy IOT-xnode match application any
+set security policies from-zone IOT to-zone ICD policy IOT-xnode then permit
+set security policies from-zone ICD to-zone wan policy xnode-out match source-address any
+set security policies from-zone ICD to-zone wan policy xnode-out match destination-address any
+set security policies from-zone ICD to-zone wan policy xnode-out match application any
+set security policies from-zone ICD to-zone wan policy xnode-out then permit
+set security policies from-zone ICD to-zone vpn_OrgOverlay policy xnode-iot match source-address any
+set security policies from-zone ICD to-zone vpn_OrgOverlay policy xnode-iot match destination-address any
+set security policies from-zone ICD to-zone vpn_OrgOverlay policy xnode-iot match application any
+set security policies from-zone ICD to-zone vpn_OrgOverlay policy xnode-iot then permit
+set security policies global policy allow_mist match source-address any
+set security policies global policy allow_mist match destination-address api-ws.<cloud>.mist.com
+set security policies global policy allow_mist match destination-address api.<cloud>.mist.com
+set security policies global policy allow_mist match destination-address cdn.juniper.net
+set security policies global policy allow_mist match destination-address ep-terminator.<cloud>.mist.com
+set security policies global policy allow_mist match destination-address ep-terminator.mistsys.net
+set security policies global policy allow_mist match destination-address jma-terminator.<cloud>.mist.com
+set security policies global policy allow_mist match destination-address manage.<cloud>.mist.com
+set security policies global policy allow_mist match destination-address oc-term.<cloud>.mist.com
+set security policies global policy allow_mist match destination-address portal.<cloud>.mist.com
+set security policies global policy allow_mist match destination-address radsec.nac.mist.com
+set security policies global policy allow_mist match destination-address redirect.juniper.net
+set security policies global policy allow_mist match destination-address srx-log-terminator.<cloud>.mist.com
+set security policies global policy allow_mist match destination-address ztp.<cloud>.mist.com
+set security policies global policy allow_mist match application tcp_2083
+set security policies global policy allow_mist match application tcp_2200
+set security policies global policy allow_mist match application tcp_443
+set security policies global policy allow_mist match application tcp_6514
+set security policies global policy allow_mist match dynamic-application any
+set security policies global policy allow_mist match from-zone CORP
+set security policies global policy allow_mist match from-zone GUEST
+set security policies global policy allow_mist match from-zone IOT
+set security policies global policy allow_mist match from-zone MEDIA
+set security policies global policy allow_mist match from-zone MGMT
+set security policies global policy allow_mist match from-zone SECURITY
+set security policies global policy allow_mist then permit
+set security policies default-policy deny-all
+set security zones security-zone wan tcp-rst
+set security zones security-zone wan screen untrust-screen
+set security zones security-zone wan host-inbound-traffic system-services dhcp
+set security zones security-zone wan host-inbound-traffic system-services ike
+set security zones security-zone wan interfaces ge-0/0/2.0
+set security zones security-zone CORP tcp-rst
+set security zones security-zone CORP host-inbound-traffic system-services dhcp
+set security zones security-zone CORP interfaces ge-0/0/3.20
+set security zones security-zone GUEST tcp-rst
+set security zones security-zone GUEST host-inbound-traffic system-services dhcp
+set security zones security-zone GUEST interfaces ge-0/0/3.30
+set security zones security-zone IOT tcp-rst
+set security zones security-zone IOT host-inbound-traffic system-services dhcp
+set security zones security-zone IOT interfaces ge-0/0/3.60
+set security zones security-zone MEDIA tcp-rst
+set security zones security-zone MEDIA host-inbound-traffic system-services dhcp
+set security zones security-zone MEDIA interfaces ge-0/0/3.40
+set security zones security-zone MGMT tcp-rst
+set security zones security-zone MGMT host-inbound-traffic system-services dhcp
+set security zones security-zone MGMT interfaces ge-0/0/3.0
+set security zones security-zone SECURITY tcp-rst
+set security zones security-zone SECURITY host-inbound-traffic system-services dhcp
+set security zones security-zone SECURITY interfaces ge-0/0/3.50
+set security zones security-zone vpn_OrgOverlay tcp-rst
+set security zones security-zone vpn_OrgOverlay host-inbound-traffic system-services all
+set security zones security-zone vpn_OrgOverlay host-inbound-traffic protocols all
+set security zones security-zone vpn_OrgOverlay interfaces lo0.1
+set security zones security-zone vpn_OrgOverlay interfaces st0.0
+set security zones security-zone HA interfaces ge-0/0/4.0 host-inbound-traffic system-services all
+set security zones security-zone HA interfaces ge-0/0/4.0 host-inbound-traffic protocols all
+set security zones security-zone HA interfaces lo0.0 host-inbound-traffic system-services all
+set security zones security-zone HA interfaces lo0.0 host-inbound-traffic protocols all
+set security zones security-zone ICD interfaces ge-0/0/5.0 host-inbound-traffic system-services all
+set security zones security-zone ICD interfaces ge-0/0/5.0 host-inbound-traffic protocols all
+set interfaces interface-range wan member ge-0/0/2
+set interfaces interface-range wan apply-groups wan
+set interfaces interface-range lan member ge-0/0/3
+set interfaces interface-range lan apply-groups lan
+set interfaces ge-0/0/2 unit 0 family inet dhcp vendor-id Juniper
+set interfaces ge-0/0/3 flexible-vlan-tagging
+set interfaces ge-0/0/3 native-vlan-id 10
+set interfaces ge-0/0/3 unit 0 description MGMT
+set interfaces ge-0/0/3 unit 0 vlan-id 10
+set interfaces ge-0/0/3 unit 0 family inet address 10.10.10.2/24
+set interfaces ge-0/0/3 unit 20 description CORP
+set interfaces ge-0/0/3 unit 20 vlan-id 20
+set interfaces ge-0/0/3 unit 20 family inet address 10.10.20.2/24
+set interfaces ge-0/0/3 unit 30 description GUEST
+set interfaces ge-0/0/3 unit 30 vlan-id 30
+set interfaces ge-0/0/3 unit 30 family inet address 10.10.30.2/24
+set interfaces ge-0/0/3 unit 40 description MEDIA
+set interfaces ge-0/0/3 unit 40 vlan-id 40
+set interfaces ge-0/0/3 unit 40 family inet address 10.10.40.2/24
+set interfaces ge-0/0/3 unit 50 description SECURITY
+set interfaces ge-0/0/3 unit 50 vlan-id 50
+set interfaces ge-0/0/3 unit 50 family inet address 10.10.50.2/24
+set interfaces ge-0/0/3 unit 60 description IOT
+set interfaces ge-0/0/3 unit 60 vlan-id 60
+set interfaces ge-0/0/3 unit 60 family inet address 10.10.60.2/24
+set interfaces ge-0/0/4 description "MNHA ICL to SRX400-2"
+set interfaces ge-0/0/4 unit 0 family inet address 10.255.0.1/30
+set interfaces ge-0/0/5 description "inter-node transit link to SRX400-2"
+set interfaces ge-0/0/5 unit 0 family inet address 10.255.2.1/30
+set interfaces lo0 unit 0 family inet address 10.255.1.1/32
+set interfaces lo0 unit 1 family inet address 100.101.0.1/32
+set interfaces re0:mgmt-0 unit 0 family inet address <NODE1-MGMT-IP>/24
+set interfaces st0 unit 0 multipoint
+set interfaces st0 unit 0 family inet address 100.65.0.2/18
+set policy-options policy-statement ICD-IMPORT term hub from route-filter 10.200.0.0/16 orlonger
+set policy-options policy-statement ICD-IMPORT term hub then preference 175
+set policy-options policy-statement ICD-IMPORT term hub then accept
+set policy-options policy-statement ICD-IMPORT term rest then accept
+set policy-options policy-statement HUB-FROM-OVERLAY term hub from instance vpn_OrgOverlay
+set policy-options policy-statement HUB-FROM-OVERLAY term hub from protocol bgp
+set policy-options policy-statement HUB-FROM-OVERLAY term hub from route-filter 10.200.0.0/16 orlonger
+set policy-options policy-statement HUB-FROM-OVERLAY term hub then community add HUB-LOCAL
+set policy-options policy-statement HUB-FROM-OVERLAY term hub then accept
+set policy-options policy-statement HUB-FROM-OVERLAY term end then reject
+set policy-options policy-statement IOT-LP term active from condition MNHA-ACTIVE
+set policy-options policy-statement IOT-LP term active then local-preference 200
+set policy-options policy-statement WAN-EXPORT term default from route-filter 0.0.0.0/0 exact
+set policy-options policy-statement WAN-EXPORT term default then accept
+set policy-options policy-statement WAN-EXPORT term lan from protocol static
+set policy-options policy-statement WAN-EXPORT term lan from route-filter 10.10.10.0/24 exact
+set policy-options policy-statement WAN-EXPORT term lan from route-filter 10.10.20.0/24 exact
+set policy-options policy-statement WAN-EXPORT term lan from route-filter 10.10.30.0/24 exact
+set policy-options policy-statement WAN-EXPORT term lan from route-filter 10.10.40.0/24 exact
+set policy-options policy-statement WAN-EXPORT term lan from route-filter 10.10.50.0/24 exact
+set policy-options policy-statement WAN-EXPORT term lan from route-filter 10.10.60.0/24 exact
+set policy-options policy-statement WAN-EXPORT term lan from condition MNHA-ACTIVE
+set policy-options policy-statement WAN-EXPORT term lan then accept
+set policy-options policy-statement WAN-EXPORT term hub from community HUB-LOCAL
+set policy-options policy-statement WAN-EXPORT term hub then accept
+set policy-options policy-statement WAN-EXPORT term end then reject
+set policy-options policy-statement WAN-LEAK-POL term wan to rib WAN-VR.inet.0
+set policy-options policy-statement WAN-LEAK-POL term wan then accept
+set policy-options policy-statement WAN-LEAK-POL term default from route-filter 0.0.0.0/0 exact
+set policy-options policy-statement WAN-LEAK-POL term default then accept
+set policy-options policy-statement WAN-LEAK-POL term end then reject
+set policy-options community HUB-LOCAL members 65000:1000
+set policy-options condition MNHA-ACTIVE if-route-exists address-family inet 10.255.3.1/32
+set policy-options condition MNHA-ACTIVE if-route-exists address-family inet table inet.0
+set routing-instances GUEST-VR instance-type virtual-router
+set routing-instances GUEST-VR routing-options static route 0.0.0.0/0 next-table WAN-VR.inet.0
+set routing-instances GUEST-VR routing-options static route 0.0.0.0/0 preference 200
+set routing-instances GUEST-VR system services dhcp-local-server group GUEST interface ge-0/0/3.30
+set routing-instances GUEST-VR system services dhcp-local-server active-leasequery peer-address 10.10.30.3
+set routing-instances GUEST-VR system services dhcp-local-server active-leasequery timeout 60
+set routing-instances GUEST-VR system services dhcp-local-server active-leasequery idle-timeout 10
+set routing-instances GUEST-VR access address-assignment pool GUEST family inet network 10.10.30.0/24
+set routing-instances GUEST-VR access address-assignment pool GUEST family inet range GUEST low 10.10.30.10
+set routing-instances GUEST-VR access address-assignment pool GUEST family inet range GUEST high 10.10.30.200
+set routing-instances GUEST-VR access address-assignment pool GUEST family inet dhcp-attributes name-server 1.1.1.1
+set routing-instances GUEST-VR access address-assignment pool GUEST family inet dhcp-attributes name-server 8.8.8.8
+set routing-instances GUEST-VR access address-assignment pool GUEST family inet dhcp-attributes router 10.10.30.1
+set routing-instances GUEST-VR interface ge-0/0/3.30
+set routing-instances WAN-VR instance-type virtual-router
+set routing-instances WAN-VR routing-options router-id 10.255.2.1
+set routing-instances WAN-VR routing-options autonomous-system 65001
+set routing-instances WAN-VR routing-options static route 10.10.10.0/24 discard
+set routing-instances WAN-VR routing-options static route 10.10.10.0/24 preference 250
+set routing-instances WAN-VR routing-options static route 10.10.20.0/24 discard
+set routing-instances WAN-VR routing-options static route 10.10.20.0/24 preference 250
+set routing-instances WAN-VR routing-options static route 10.10.30.0/24 discard
+set routing-instances WAN-VR routing-options static route 10.10.30.0/24 preference 250
+set routing-instances WAN-VR routing-options static route 10.10.40.0/24 discard
+set routing-instances WAN-VR routing-options static route 10.10.40.0/24 preference 250
+set routing-instances WAN-VR routing-options static route 10.10.50.0/24 discard
+set routing-instances WAN-VR routing-options static route 10.10.50.0/24 preference 250
+set routing-instances WAN-VR routing-options static route 10.10.60.0/24 discard
+set routing-instances WAN-VR routing-options static route 10.10.60.0/24 preference 250
+set routing-instances WAN-VR routing-options instance-import HUB-FROM-OVERLAY
+set routing-instances WAN-VR protocols bgp group ICD type external
+set routing-instances WAN-VR protocols bgp group ICD import ICD-IMPORT
+set routing-instances WAN-VR protocols bgp group ICD family inet unicast rib-group WAN-LEAK
+set routing-instances WAN-VR protocols bgp group ICD export WAN-EXPORT
+set routing-instances WAN-VR protocols bgp group ICD peer-as 65002
+set routing-instances WAN-VR protocols bgp group ICD bfd-liveness-detection minimum-interval 300
+set routing-instances WAN-VR protocols bgp group ICD bfd-liveness-detection multiplier 3
+set routing-instances WAN-VR protocols bgp group ICD neighbor 10.255.2.2
+set routing-instances WAN-VR interface ge-0/0/2.0
+set routing-instances WAN-VR interface ge-0/0/5.0
+set routing-instances lan routing-options static route 0.0.0.0/0 next-table WAN-VR.inet.0
+set routing-instances lan routing-options instance-import vpn_OrgOverlay_bgp
+set routing-instances lan system services dhcp-local-server active-leasequery peer-address 10.10.10.3
+set routing-instances lan system services dhcp-local-server active-leasequery timeout 60
+set routing-instances lan system services dhcp-local-server active-leasequery idle-timeout 10
+set routing-instances vpn_OrgOverlay routing-options autonomous-system 65000
+set routing-instances vpn_OrgOverlay protocols bgp group OrgOverlay_overlay export IOT-LP
+set routing-instances vpn_OrgOverlay protocols bgp group OrgOverlay_overlay export OrgOverlay_advertise
+set routing-instances vpn_OrgOverlay protocols bgp group OrgOverlay_overlay bfd-liveness-detection minimum-interval 1000
+set routing-instances vpn_OrgOverlay protocols bgp group OrgOverlay_overlay bfd-liveness-detection multiplier 3
+set routing-options autonomous-system 65001
+set routing-options static route 0.0.0.0/0 qualified-next-hop <mgmt-gateway> preference 1
+set routing-options static route 10.255.1.2/32 next-hop 10.255.0.2
+set routing-options rib-groups WAN-LEAK import-rib WAN-VR.inet.0
+set routing-options rib-groups WAN-LEAK import-rib lan.inet.0
+set routing-options rib-groups WAN-LEAK import-rib GUEST-VR.inet.0
+set routing-options rib-groups WAN-LEAK import-policy WAN-LEAK-POL
+set protocols lldp port-id-subtype interface-name
+set protocols lldp port-description-type interface-alias
+set protocols lldp interface all
+set protocols lldp-med interface all

@@ -1,0 +1,234 @@
+# vSRX hub vSRX-NG (Mist overlay hub, static WAN) - configuration in display set form
+# Reference for the paper "SRX400 MNHA Secure Branch Design": the lab's as-built running configuration of the
+#   Hub Profile build (15 Oct 2026, after the Mist commit) with the generic values substituted (the paper's
+#   names and addresses, placeholders). It is not a verbatim capture and not a Mist render of the files in
+#   mist/.
+# Release as captured: 24.4R2-S4.12 (see "set version").
+# Produced in the lab by: Mist org objects + Hub Profile native settings (rendered by Mist) + Additional
+#   CLI. Their generic form: mist/org/, mist/hub-profiles/vsrx-hub.json (Hub Profile HUB) and
+#   mist/additional-cli/vsrx-hub.txt.
+# Derived, not captured: the 10.200.0.0/16 discard route and the 10_hub_site route-filter stand for the
+#   lab's hub-site prefixes; the host name and a single NTP server line are normalised values.
+# Not shown: the lines Mist writes at adoption (user mist, outbound-ssh to the Mist cloud, group mist-script,
+#   scripts, extensions, ephemeral database), certificates and keys, management access settings (README),
+#   and the hub's lab-only lines of paper 4.5 (management, lab routes, a second ISP-side link).
+# Present and LAB ONLY (README, LAB ONLY): the 10.200.0.0/16 discard route and the 10.200.8.1/32 test host on
+#   lo0.1. The WAN address 172.16.11.2/30 is the lab's address.
+# Placeholders (replace before use): <cloud>, <HUB-MGMT-IP>, <NTP-SERVER>, <ORG-ID>, <ROOT-PASSWORD-HASH>
+set version 24.4R2-S4.12
+set groups wan
+set groups top system name-server 8.8.8.8
+set groups top system name-server 1.1.1.1
+set groups top system ntp server <NTP-SERVER>
+set groups top services rpm probe wan test wan_ping probe-type icmp-ping
+set groups top services rpm probe wan test wan_ping target address 8.8.8.8
+set groups top services rpm probe wan test wan_ping probe-count 3
+set groups top services rpm probe wan test wan_ping probe-interval 5
+set groups top services rpm probe wan test wan_ping test-interval 30
+set groups top services rpm probe wan test wan_ping thresholds successive-loss 2
+set groups top services rpm probe wan test wan_ping thresholds total-loss 2
+set groups top services rpm probe wan test wan_ping hardware-timestamp
+set groups top interfaces lo0 unit 0 family inet address 100.100.0.4/32
+set groups top forwarding-options storm-control-profiles default all
+set groups top policy-options policy-statement ecmp_policy then load-balance per-packet
+set groups top policy-options policy-statement ecmp_policy then accept
+set groups top policy-options policy-statement master_direct term 01_direct from instance master
+set groups top policy-options policy-statement master_direct term 01_direct from protocol direct
+set groups top policy-options policy-statement master_direct term 01_direct then accept
+set groups top policy-options policy-statement vpn_OrgOverlay_bgp term 01_bgp from instance vpn_OrgOverlay
+set groups top policy-options policy-statement vpn_OrgOverlay_bgp term 01_bgp from protocol bgp
+set groups top policy-options policy-statement vpn_OrgOverlay_bgp term 01_bgp then accept
+set groups top policy-options policy-statement vpn_OrgOverlay_bgp term 02_not_bgp from instance vpn_OrgOverlay
+set groups top policy-options policy-statement vpn_OrgOverlay_bgp term 02_not_bgp then reject
+set groups top policy-options policy-statement vpn_OrgOverlay_direct term 01_direct from instance vpn_OrgOverlay
+set groups top policy-options policy-statement vpn_OrgOverlay_direct term 01_direct from protocol direct
+set groups top policy-options policy-statement vpn_OrgOverlay_direct term 01_direct then accept
+set groups top policy-options policy-statement vpn_OrgOverlay_direct term 02_not_direct from instance vpn_OrgOverlay
+set groups top policy-options policy-statement vpn_OrgOverlay_direct term 02_not_direct then reject
+set groups top policy-options policy-statement OrgOverlay_advertise term 01_redistribute from protocol bgp
+set groups top policy-options policy-statement OrgOverlay_advertise term 01_redistribute from protocol ospf
+set groups top policy-options policy-statement OrgOverlay_advertise term 01_redistribute then next-hop self
+set groups top policy-options policy-statement OrgOverlay_advertise term 01_redistribute then accept
+set groups top policy-options policy-statement wan_default term 01_wan_default from instance master
+set groups top policy-options policy-statement wan_default term 01_wan_default from route-filter 0.0.0.0/0 exact
+set groups top policy-options policy-statement wan_default term 01_wan_default then accept
+set groups top policy-options policy-statement wan_default term 02_wan_local from instance master
+set groups top policy-options policy-statement wan_default term 02_wan_local from protocol local
+set groups top policy-options policy-statement wan_default term 02_wan_local to rib inet.0
+set groups top policy-options policy-statement wan_default term 02_wan_local then accept
+set groups top policy-options policy-statement wan_default term 03_wan_cleanup from instance master
+set groups top policy-options policy-statement wan_default term 03_wan_cleanup from protocol direct
+set groups top policy-options policy-statement wan_default term 03_wan_cleanup from protocol local
+set groups top policy-options policy-statement wan_default term 03_wan_cleanup then reject
+set groups top routing-instances vpn_OrgOverlay instance-type virtual-router
+set groups top routing-instances vpn_OrgOverlay routing-options instance-import master_direct
+set groups top routing-instances vpn_OrgOverlay protocols bgp group OrgOverlay_overlay type internal
+set groups top routing-instances vpn_OrgOverlay protocols bgp group OrgOverlay_overlay local-address 100.101.0.4
+set groups top routing-instances vpn_OrgOverlay protocols bgp group OrgOverlay_overlay log-updown
+set groups top routing-instances vpn_OrgOverlay protocols bgp group OrgOverlay_overlay bgp-error-tolerance malformed-route-limit 1
+set groups top routing-instances vpn_OrgOverlay protocols bgp group OrgOverlay_overlay export OrgOverlay_advertise
+set groups top routing-instances vpn_OrgOverlay protocols bgp group OrgOverlay_overlay cluster 100.101.0.4
+set groups top routing-instances vpn_OrgOverlay protocols bgp group OrgOverlay_overlay allow 100.101.0.0/16
+set groups top routing-instances vpn_OrgOverlay interface lo0.1
+set groups top routing-instances vpn_OrgOverlay interface st0.0
+set groups top routing-instances vpn_OrgOverlay interface st0.1
+set groups top routing-instances vpn_OrgOverlay interface st0.2
+set groups top routing-instances vpn_OrgOverlay interface st0.3
+set groups top routing-options router-id 100.100.0.4
+set groups top routing-options autonomous-system 65000
+set groups top routing-options static route 0.0.0.0/0 next-hop 172.16.11.1
+set groups top routing-options forwarding-table export ecmp_policy
+set groups mist-wa services ssl initiation profile app_usage protocol-version tls12
+set groups mist-wa services ssl initiation profile app_usage trusted-ca mist-ca
+set groups mist-wa services ssl initiation profile app_usage client-certificate mist-device-cert
+set groups mist-wa services ssl initiation profile app_usage actions crl disable
+set groups mist-wa security log utc-timestamp
+set groups mist-wa security log mode stream
+set groups mist-wa security log source-address 100.100.0.4
+set groups mist-wa security log stream app_usage format binary
+set groups mist-wa security log stream app_usage category aamw
+set groups mist-wa security log stream app_usage category content-security
+set groups mist-wa security log stream app_usage category flow
+set groups mist-wa security log stream app_usage category idp
+set groups mist-wa security log stream app_usage category rtlog
+set groups mist-wa security log stream app_usage category secintel
+set groups mist-wa security log stream app_usage host srx-log-terminator.<cloud>.mist.com
+set groups mist-wa security log stream app_usage host port 6514
+set groups mist-wa security log stream app_usage transport tcp-connections 1
+set groups mist-wa security log stream app_usage transport protocol tls
+set groups mist-wa security log stream app_usage transport tls-profile app_usage
+set groups mist-wa security log stream app_usage source-address 100.100.0.4
+set groups mist-wa security application-tracking session-update-interval 3
+set groups mist-wa security application-tracking log-session-close
+set groups mist-wa security zones security-zone wan application-tracking
+set groups mist-wa security zones security-zone vpn_OrgOverlay application-tracking
+set apply-groups top
+set apply-groups mist-wa
+set system host-name vSRX-NG
+set system root-authentication encrypted-password "<ROOT-PASSWORD-HASH>"
+set system services netconf ssh
+set system services ssh protocol-version v2
+set system time-zone UTC
+set system syslog archive size 1m
+set system syslog archive files 10
+set system syslog file escript.log archive size 2m
+set system syslog file escript.log archive files 5
+set system syslog file interactive-commands interactive-commands any
+set system syslog file interactive-commands match "!(.*mist.*)"
+set system syslog file interactive-commands archive size 2m
+set system syslog file interactive-commands archive files 5
+set system syslog file messages any any
+set system syslog file messages authorization info
+set system syslog file op-script.log archive size 2m
+set system syslog file op-script.log archive files 5
+set system syslog file snapshot archive size 2m
+set system syslog file snapshot archive files 5
+set security pki ca-profile mist-ca ca-identity mist-ca
+set security pki ca-profile mist-vpn-ca ca-identity mist-vpn-ca
+set security pki ca-profile mist-vpn-ca revocation-check use-crl
+set security pki ca-profile mist-vpn-ca revocation-check crl disable on-download-failure
+set security pki ca-profile mist-vpn-ca revocation-check crl refresh-interval 0
+set security ike proposal OrgOverlay authentication-method rsa-signatures
+set security ike proposal OrgOverlay dh-group group14
+set security ike proposal OrgOverlay encryption-algorithm aes-256-gcm
+set security ike proposal OrgOverlay lifetime-seconds 3600
+set security ike policy OrgOverlay_wan mode main
+set security ike policy OrgOverlay_wan proposals OrgOverlay
+set security ike policy OrgOverlay_wan certificate local-certificate mist-vpn-cert-1
+set security ike gateway OrgOverlay_hub_on_wan ike-policy OrgOverlay_wan
+set security ike gateway OrgOverlay_hub_on_wan dynamic distinguished-name wildcard OU=<ORG-ID>
+set security ike gateway OrgOverlay_hub_on_wan dynamic ike-user-type group-ike-id
+set security ike gateway OrgOverlay_hub_on_wan dead-peer-detection always-send
+set security ike gateway OrgOverlay_hub_on_wan dead-peer-detection interval 3
+set security ike gateway OrgOverlay_hub_on_wan dead-peer-detection threshold 3
+set security ike gateway OrgOverlay_hub_on_wan local-identity distinguished-name
+set security ike gateway OrgOverlay_hub_on_wan external-interface ge-0/0/0.0
+set security ike gateway OrgOverlay_hub_on_wan version v2-only
+set security ipsec proposal OrgOverlay protocol esp
+set security ipsec proposal OrgOverlay encryption-algorithm aes-256-gcm
+set security ipsec proposal OrgOverlay lifetime-seconds 1800
+set security ipsec policy OrgOverlay proposals OrgOverlay
+set security ipsec vpn OrgOverlay_hub_on_wan bind-interface st0.0
+set security ipsec vpn OrgOverlay_hub_on_wan df-bit copy
+set security ipsec vpn OrgOverlay_hub_on_wan ike gateway OrgOverlay_hub_on_wan
+set security ipsec vpn OrgOverlay_hub_on_wan ike proxy-identity local 1.0.0.1/32
+set security ipsec vpn OrgOverlay_hub_on_wan ike proxy-identity remote 1.0.0.251/32
+set security ipsec vpn OrgOverlay_hub_on_wan ike ipsec-policy OrgOverlay
+set security ipsec vpn OrgOverlay_hub_on_wan_1 bind-interface st0.1
+set security ipsec vpn OrgOverlay_hub_on_wan_1 df-bit copy
+set security ipsec vpn OrgOverlay_hub_on_wan_1 ike gateway OrgOverlay_hub_on_wan
+set security ipsec vpn OrgOverlay_hub_on_wan_1 ike proxy-identity local 1.0.0.1/32
+set security ipsec vpn OrgOverlay_hub_on_wan_1 ike proxy-identity remote 1.0.0.252/32
+set security ipsec vpn OrgOverlay_hub_on_wan_1 ike ipsec-policy OrgOverlay
+set security ipsec vpn OrgOverlay_hub_on_wan_2 bind-interface st0.2
+set security ipsec vpn OrgOverlay_hub_on_wan_2 df-bit copy
+set security ipsec vpn OrgOverlay_hub_on_wan_2 ike gateway OrgOverlay_hub_on_wan
+set security ipsec vpn OrgOverlay_hub_on_wan_2 ike proxy-identity local 1.0.0.1/32
+set security ipsec vpn OrgOverlay_hub_on_wan_2 ike proxy-identity remote 1.0.0.253/32
+set security ipsec vpn OrgOverlay_hub_on_wan_2 ike ipsec-policy OrgOverlay
+set security ipsec vpn OrgOverlay_hub_on_wan_3 bind-interface st0.3
+set security ipsec vpn OrgOverlay_hub_on_wan_3 df-bit copy
+set security ipsec vpn OrgOverlay_hub_on_wan_3 ike gateway OrgOverlay_hub_on_wan
+set security ipsec vpn OrgOverlay_hub_on_wan_3 ike proxy-identity local 1.0.0.1/32
+set security ipsec vpn OrgOverlay_hub_on_wan_3 ike proxy-identity remote 1.0.0.254/32
+set security ipsec vpn OrgOverlay_hub_on_wan_3 ike ipsec-policy OrgOverlay
+set security screen ids-option untrust-screen icmp ping-death
+set security screen ids-option untrust-screen ip source-route-option
+set security screen ids-option untrust-screen ip tear-drop
+set security screen ids-option untrust-screen tcp syn-flood alarm-threshold 1024
+set security screen ids-option untrust-screen tcp syn-flood attack-threshold 200
+set security screen ids-option untrust-screen tcp syn-flood source-threshold 1024
+set security screen ids-option untrust-screen tcp syn-flood destination-threshold 2048
+set security screen ids-option untrust-screen tcp syn-flood timeout 20
+set security screen ids-option untrust-screen tcp land
+set security nat source rule-set host_to_wan from zone junos-host
+set security nat source rule-set host_to_wan to zone wan
+set security nat source rule-set host_to_wan rule host_to_wan match source-address 0.0.0.0/0
+set security nat source rule-set host_to_wan rule host_to_wan then source-nat interface
+set security policies from-zone vpn_OrgOverlay to-zone vpn_OrgOverlay policy same_zone match source-address any
+set security policies from-zone vpn_OrgOverlay to-zone vpn_OrgOverlay policy same_zone match destination-address any
+set security policies from-zone vpn_OrgOverlay to-zone vpn_OrgOverlay policy same_zone match application any
+set security policies from-zone vpn_OrgOverlay to-zone vpn_OrgOverlay policy same_zone then permit
+set security policies default-policy deny-all
+set security zones security-zone wan tcp-rst
+set security zones security-zone wan screen untrust-screen
+set security zones security-zone wan host-inbound-traffic system-services ike
+set security zones security-zone wan interfaces ge-0/0/0.0
+set security zones security-zone vpn_OrgOverlay tcp-rst
+set security zones security-zone vpn_OrgOverlay host-inbound-traffic system-services all
+set security zones security-zone vpn_OrgOverlay host-inbound-traffic protocols all
+set security zones security-zone vpn_OrgOverlay interfaces lo0.1
+set security zones security-zone vpn_OrgOverlay interfaces st0.0
+set security zones security-zone vpn_OrgOverlay interfaces st0.1
+set security zones security-zone vpn_OrgOverlay interfaces st0.2
+set security zones security-zone vpn_OrgOverlay interfaces st0.3
+set interfaces interface-range wan member ge-0/0/0
+set interfaces interface-range wan apply-groups wan
+set interfaces ge-0/0/0 description "hub WAN"
+set interfaces ge-0/0/0 unit 0 family inet address 172.16.11.2/30
+set interfaces fxp0 unit 0 family inet address <HUB-MGMT-IP>/24
+set interfaces lo0 unit 1 family inet address 100.101.0.4/32
+set interfaces lo0 unit 1 family inet address 10.200.8.1/32
+set interfaces st0 unit 0 multipoint
+set interfaces st0 unit 0 family inet address 100.65.0.1/18
+set interfaces st0 unit 1 multipoint
+set interfaces st0 unit 1 family inet address 100.65.64.1/18
+set interfaces st0 unit 2 multipoint
+set interfaces st0 unit 2 family inet address 100.65.128.1/18
+set interfaces st0 unit 3 multipoint
+set interfaces st0 unit 3 family inet address 100.65.192.1/18
+set policy-options policy-statement OVERLAY-IN term no-mnha from route-filter 10.255.0.0/16 orlonger
+set policy-options policy-statement OVERLAY-IN term no-mnha then reject
+set policy-options policy-statement OVERLAY-IN term rest then accept
+set policy-options policy-statement OrgOverlay_advertise term 10_hub_site from protocol static
+set policy-options policy-statement OrgOverlay_advertise term 10_hub_site from route-filter 10.200.0.0/16 exact
+set policy-options policy-statement OrgOverlay_advertise term 10_hub_site then next-hop self
+set policy-options policy-statement OrgOverlay_advertise term 10_hub_site then accept
+set routing-instances vpn_OrgOverlay routing-options static route 10.200.0.0/16 discard
+set routing-instances vpn_OrgOverlay protocols bgp group OrgOverlay_overlay import OVERLAY-IN
+set routing-instances vpn_OrgOverlay protocols bgp group OrgOverlay_overlay bfd-liveness-detection minimum-interval 1000
+set routing-instances vpn_OrgOverlay protocols bgp group OrgOverlay_overlay bfd-liveness-detection multiplier 3
+set protocols lldp port-id-subtype interface-name
+set protocols lldp port-description-type interface-alias
+set protocols lldp interface all
+set protocols lldp-med interface all
