@@ -1,25 +1,8 @@
-# SRX400 node 1 (MNHA local-id 1, SRG1 activeness-priority 200, ISP 1) - configuration in display set form
-# Reference for the paper "SRX400 MNHA Secure Branch Design": the lab's as-built running configuration of the
-#   Hub Profile build (15 Oct 2026, after the Mist commit) with the generic values substituted (the paper's
-#   names and addresses, the generic tenant plan, placeholders). It is not a verbatim capture and not a Mist
-#   render of the files in mist/.
-# Per-tenant blocks that the capture listed in the order of the network names are listed in the order of
-#   the generic names (CORP, GUEST, IOT, MEDIA, MGMT, SECURITY), and the WAN-VR tenant discard routes in
-#   prefix order, as Junos lists static routes; other blocks keep the captured order.
-# Release: Junos OS Evolved 25.4X300-D30 (README, Release).
-# Produced in the lab by: Mist org objects + Hub Profile native settings (rendered by Mist) + Additional
-#   CLI. Their generic form: mist/org/, mist/hub-profiles/srx400-node1.json (Hub Profile SRX400-1) and
-#   mist/additional-cli/srx400-node1.txt.
-#   The PKI and SSL lines for ATP Cloud (aamw-*) are written on the box by ATP Cloud enrollment (paper 3.1, 5.2).
-# Derived, not captured: the address-book entry 10-200-0-0_16 and the two destination-address lines that use it
-#   (policy 01_allow-to-hub, group apbr) follow Mist's naming for the 10.200.0.0/16 application; the lab
-#   application listed several hub-site prefixes.
-# Not shown: the lines Mist writes at adoption (user mist, outbound-ssh to the Mist cloud, group mist-script,
-#   scripts, extensions, ephemeral database), certificates and keys, DHCP host reservations, management
-#   access settings and the "set version" line (README, What these files leave out).
-# Present and LAB ONLY (README, LAB ONLY): WAN-VR holding the WAN port ge-0/0/2, and the inet.0 default
-#   0.0.0.0/0 qualified-next-hop <mgmt-gateway> preference 1.
-# Placeholders (replace before use): <cloud>, <hub-MAC>, <mgmt-gateway>, <NODE1-MGMT-IP>, <NTP-SERVER>, <region>, <ROOT-PASSWORD-HASH>
+# SRX400 node 1 (Hub Profile SRX400-1, ISP 1): as-built lab configuration, display set form, generic values.
+# Not a Mist render of mist/*.json: a few lines derived, some blocks reordered, some lines left out (README).
+# Release: Junos OS Evolved 25.4X300-D30. LAB ONLY: ge-0/0/2 in WAN-VR and the inet.0 default (README, Good to know).
+# Replace before use: <hub-MAC>, <mgmt-gateway>, <NODE1-MGMT-IP>, <region> (README, step 2); <cloud>: your Mist cloud;
+#   <NTP-SERVER>: the server Mist renders (profiles set pool.ntp.org); <ROOT-PASSWORD-HASH>: set by you or Mist.
 set groups wan
 set groups lan
 set groups apbr security advance-policy-based-routing profile IOT rule 01 match dynamic-application any
