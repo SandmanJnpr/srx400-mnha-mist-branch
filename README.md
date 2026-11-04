@@ -1,5 +1,7 @@
 # SRX400 MNHA Secure Branch under Juniper Mist
 
+**Eric Sandoval**, Network Security Architect, HPE
+
 Two SRX400 nodes, two ISPs, one Mist Hub Profile per node: a lab-validated branch design with profiles you can import.
 Design, test results and build order: **[the paper (PDF)](docs/SRX400-MNHA-Secure-Branch-Design.pdf)**.
 
@@ -125,8 +127,6 @@ Organization > WAN > Hub Profiles > Import Profile. Choose the file, type the Na
 - **Failover:** firewall sessions are synchronized; IPsec security associations are not (each tunnel is node-local). Established sessions across a failover are not yet tested; the results use pings (paper 3.7, 9).
 - **DHCP, if the nodes run 25.4X300-D30.2:** add `dhcp-local-server overrides no-unicast-replies` to `lan` and `GUEST-VR` in both node profiles (paper 3.6, 5.5). These files do not carry it. Pushing it from the profiles is not yet tested; the `GUEST-VR` line is not tested by any method.
 - **Not yet tested:** paper section 9 lists every open item, for example ICL loss and split-brain, transit link failure and a fresh node build.
-
-**Author:** Eric Sandoval, Network Security Architect, HPE
 
 > Lab-validated reference by the author. It is not an official Juniper Networks or HPE position or support
 > statement. Verify every line in your own lab before use.
