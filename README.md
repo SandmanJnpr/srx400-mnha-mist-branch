@@ -8,7 +8,7 @@ A lab-validated SRX400 MNHA branch design under Juniper Mist: the paper and the 
 |---|---|
 | [docs/SRX400-MNHA-Secure-Branch-Design.pdf](docs/SRX400-MNHA-Secure-Branch-Design.pdf) | The paper: design, configuration, test results and build order. [Open it in the browser](https://sandmanjnpr.github.io/srx400-mnha-mist-branch/docs/SRX400-MNHA-Secure-Branch-Design.pdf) for clickable contents. |
 | [mist/srx400-node1.json](mist/srx400-node1.json), [mist/srx400-node2.json](mist/srx400-node2.json) | Mist Hub Profiles for SRX400 node 1 and node 2 (Organization > WAN > Hub Profiles > Import Profile) |
-| [mist/vsrx-hub.json](mist/vsrx-hub.json) | Mist Hub Profile for the vSRX hub |
+| [mist/vsrx-hub.json](mist/vsrx-hub.json) | Mist Hub Profile for the vSRX hub: the IPsec overlay hub that both SRX400 nodes build their tunnels to |
 | [junos/srx400-node1.set](junos/srx400-node1.set), [junos/srx400-node2.set](junos/srx400-node2.set) | Each node's configuration in `display set` form |
 
 Values in angle brackets (`<...>`) are placeholders, and the lab addresses are examples: replace both before use (paper section 10).
