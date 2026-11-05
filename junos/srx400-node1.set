@@ -1,5 +1,5 @@
 # SRX400 node 1 (Hub Profile SRX400-1, ISP 1): as-built lab configuration, display set form, generic values.
-# Not a Mist render of mist/*.json: a few lines derived, some blocks reordered, some lines left out (README).
+# Not a Mist render of mist/*.json: lines derived, blocks reordered, lines left out (README); IPv6: paper 9.
 # Release: Junos OS Evolved 25.4X300-D30. LAB ONLY: ge-0/0/2 in WAN-VR and the inet.0 default (README, Good to know).
 # Replace before use: <hub-MAC>, <mgmt-gateway>, <NODE1-MGMT-IP>, <region> (README, step 2); <cloud>: your Mist cloud;
 #   <NTP-SERVER>: the server Mist renders (profiles set pool.ntp.org); <ROOT-PASSWORD-HASH>: set by you or Mist.
@@ -397,11 +397,13 @@ set security policies from-zone IOT to-zone vpn_OrgOverlay policy 01_allow-to-hu
 set security policies from-zone IOT to-zone vpn_OrgOverlay policy 01_allow-to-hub match dynamic-application any
 set security policies from-zone IOT to-zone vpn_OrgOverlay policy 01_allow-to-hub then permit
 set security policies from-zone MGMT to-zone wan policy 01_Internet match source-address 10-10-10-0_24
+set security policies from-zone MGMT to-zone wan policy 01_Internet match source-address any-ipv6
 set security policies from-zone MGMT to-zone wan policy 01_Internet match destination-address any
 set security policies from-zone MGMT to-zone wan policy 01_Internet match application any
 set security policies from-zone MGMT to-zone wan policy 01_Internet match dynamic-application any
 set security policies from-zone MGMT to-zone wan policy 01_Internet then permit
 set security policies from-zone CORP to-zone wan policy 01_Internet match source-address 10-10-20-0_24
+set security policies from-zone CORP to-zone wan policy 01_Internet match source-address any-ipv6
 set security policies from-zone CORP to-zone wan policy 01_Internet match destination-address any
 set security policies from-zone CORP to-zone wan policy 01_Internet match application any
 set security policies from-zone CORP to-zone wan policy 01_Internet match dynamic-application any
@@ -412,11 +414,13 @@ set security policies from-zone GUEST to-zone wan policy 01_Internet match appli
 set security policies from-zone GUEST to-zone wan policy 01_Internet match dynamic-application any
 set security policies from-zone GUEST to-zone wan policy 01_Internet then permit
 set security policies from-zone MEDIA to-zone wan policy 01_Internet match source-address 10-10-40-0_24
+set security policies from-zone MEDIA to-zone wan policy 01_Internet match source-address any-ipv6
 set security policies from-zone MEDIA to-zone wan policy 01_Internet match destination-address any
 set security policies from-zone MEDIA to-zone wan policy 01_Internet match application any
 set security policies from-zone MEDIA to-zone wan policy 01_Internet match dynamic-application any
 set security policies from-zone MEDIA to-zone wan policy 01_Internet then permit
 set security policies from-zone SECURITY to-zone wan policy 01_Internet match source-address 10-10-50-0_24
+set security policies from-zone SECURITY to-zone wan policy 01_Internet match source-address any-ipv6
 set security policies from-zone SECURITY to-zone wan policy 01_Internet match destination-address any
 set security policies from-zone SECURITY to-zone wan policy 01_Internet match application any
 set security policies from-zone SECURITY to-zone wan policy 01_Internet match dynamic-application any
@@ -427,6 +431,7 @@ set security policies from-zone IOT to-zone wan policy GEO-BLOCK-DE match applic
 set security policies from-zone IOT to-zone wan policy GEO-BLOCK-DE then deny
 set security policies from-zone IOT to-zone wan policy GEO-BLOCK-DE then count
 set security policies from-zone IOT to-zone wan policy 01_Internet match source-address 10-10-60-0_24
+set security policies from-zone IOT to-zone wan policy 01_Internet match source-address any-ipv6
 set security policies from-zone IOT to-zone wan policy 01_Internet match destination-address any
 set security policies from-zone IOT to-zone wan policy 01_Internet match application any
 set security policies from-zone IOT to-zone wan policy 01_Internet match dynamic-application any
@@ -503,6 +508,7 @@ set security zones security-zone wan tcp-rst
 set security zones security-zone wan screen untrust-screen
 set security zones security-zone wan host-inbound-traffic system-services dhcp
 set security zones security-zone wan host-inbound-traffic system-services ike
+set security zones security-zone wan host-inbound-traffic system-services dhcpv6
 set security zones security-zone wan interfaces ge-0/0/2.0
 set security zones security-zone CORP tcp-rst
 set security zones security-zone CORP host-inbound-traffic system-services dhcp
@@ -538,26 +544,36 @@ set interfaces interface-range wan apply-groups wan
 set interfaces interface-range lan member ge-0/0/3
 set interfaces interface-range lan apply-groups lan
 set interfaces ge-0/0/2 unit 0 family inet dhcp vendor-id Juniper
+set interfaces ge-0/0/2 unit 0 family inet6 dhcpv6-client client-type stateful
+set interfaces ge-0/0/2 unit 0 family inet6 dhcpv6-client client-ia-type ia-na
+set interfaces ge-0/0/2 unit 0 family inet6 dhcpv6-client client-ia-type ia-pd
+set interfaces ge-0/0/2 unit 0 family inet6 dhcpv6-client prefix-delegating preferred-prefix-length 60
+set interfaces ge-0/0/2 unit 0 family inet6 dhcpv6-client client-identifier duid-type duid-ll
 set interfaces ge-0/0/3 flexible-vlan-tagging
 set interfaces ge-0/0/3 native-vlan-id 10
 set interfaces ge-0/0/3 unit 0 description MGMT
 set interfaces ge-0/0/3 unit 0 vlan-id 10
 set interfaces ge-0/0/3 unit 0 family inet address 10.10.10.2/24
+set interfaces ge-0/0/3 unit 0 family inet6 address 2001:db8:2000:1::2/64
 set interfaces ge-0/0/3 unit 20 description CORP
 set interfaces ge-0/0/3 unit 20 vlan-id 20
 set interfaces ge-0/0/3 unit 20 family inet address 10.10.20.2/24
+set interfaces ge-0/0/3 unit 20 family inet6 address 2001:db8:2000:2::2/64
 set interfaces ge-0/0/3 unit 30 description GUEST
 set interfaces ge-0/0/3 unit 30 vlan-id 30
 set interfaces ge-0/0/3 unit 30 family inet address 10.10.30.2/24
 set interfaces ge-0/0/3 unit 40 description MEDIA
 set interfaces ge-0/0/3 unit 40 vlan-id 40
 set interfaces ge-0/0/3 unit 40 family inet address 10.10.40.2/24
+set interfaces ge-0/0/3 unit 40 family inet6 address 2001:db8:2000:4::2/64
 set interfaces ge-0/0/3 unit 50 description SECURITY
 set interfaces ge-0/0/3 unit 50 vlan-id 50
 set interfaces ge-0/0/3 unit 50 family inet address 10.10.50.2/24
+set interfaces ge-0/0/3 unit 50 family inet6 address 2001:db8:2000:5::2/64
 set interfaces ge-0/0/3 unit 60 description IOT
 set interfaces ge-0/0/3 unit 60 vlan-id 60
 set interfaces ge-0/0/3 unit 60 family inet address 10.10.60.2/24
+set interfaces ge-0/0/3 unit 60 family inet6 address 2001:db8:2000:6::2/64
 set interfaces ge-0/0/4 description "MNHA ICL to SRX400-2"
 set interfaces ge-0/0/4 unit 0 family inet address 10.255.0.1/30
 set interfaces ge-0/0/5 description "inter-node transit link to SRX400-2"
@@ -616,6 +632,7 @@ set routing-instances GUEST-VR access address-assignment pool GUEST family inet 
 set routing-instances GUEST-VR access address-assignment pool GUEST family inet dhcp-attributes router 10.10.30.1
 set routing-instances GUEST-VR interface ge-0/0/3.30
 set routing-instances WAN-VR instance-type virtual-router
+set routing-instances WAN-VR routing-options rib WAN-VR.inet6.0 static route 2001:db8:2000::/60 discard
 set routing-instances WAN-VR routing-options router-id 10.255.2.1
 set routing-instances WAN-VR routing-options autonomous-system 65001
 set routing-instances WAN-VR routing-options static route 10.10.10.0/24 discard
@@ -641,6 +658,7 @@ set routing-instances WAN-VR protocols bgp group ICD bfd-liveness-detection mult
 set routing-instances WAN-VR protocols bgp group ICD neighbor 10.255.2.2
 set routing-instances WAN-VR interface ge-0/0/2.0
 set routing-instances WAN-VR interface ge-0/0/5.0
+set routing-instances lan routing-options rib lan.inet6.0 static route ::/0 next-table WAN-VR.inet6.0
 set routing-instances lan routing-options static route 0.0.0.0/0 next-table WAN-VR.inet.0
 set routing-instances lan routing-options instance-import vpn_OrgOverlay_bgp
 set routing-instances lan system services dhcp-local-server active-leasequery peer-address 10.10.10.3
@@ -658,6 +676,12 @@ set routing-options rib-groups WAN-LEAK import-rib WAN-VR.inet.0
 set routing-options rib-groups WAN-LEAK import-rib lan.inet.0
 set routing-options rib-groups WAN-LEAK import-rib GUEST-VR.inet.0
 set routing-options rib-groups WAN-LEAK import-policy WAN-LEAK-POL
+set protocols router-advertisement interface ge-0/0/2.0
+set protocols router-advertisement interface ge-0/0/3.0 prefix 2001:db8:2000:1::/64
+set protocols router-advertisement interface ge-0/0/3.20 prefix 2001:db8:2000:2::/64
+set protocols router-advertisement interface ge-0/0/3.40 prefix 2001:db8:2000:4::/64
+set protocols router-advertisement interface ge-0/0/3.50 prefix 2001:db8:2000:5::/64
+set protocols router-advertisement interface ge-0/0/3.60 prefix 2001:db8:2000:6::/64
 set protocols lldp port-id-subtype interface-name
 set protocols lldp port-description-type interface-alias
 set protocols lldp interface all
