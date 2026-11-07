@@ -1,7 +1,8 @@
-# SRX400 node 2 (Hub Profile SRX400-2, ISP 2): as-built lab configuration, display set form, generic values.
-# Not a Mist render of mist/*.json: a few lines derived, some blocks reordered, some lines left out (README).
-# Release: Junos OS Evolved 25.4X300-D30. LAB ONLY: ge-0/0/2 in WAN-VR and the inet.0 default (README, Good to know).
-# Replace before use: <hub-MAC>, <mgmt-gateway>, <NODE2-MGMT-IP>, <region> (README, step 2); <cloud>: your Mist cloud;
+# SRX400 node 2 (Hub Profile SRX400-2, ISP 2): configuration in display set form, generic values.
+# Left out: adoption, access and box-local lines, DHCP reservations, secrets (paper section 10).
+# Release: Junos OS Evolved 25.4X300-D30.3
+# ge-0/0/2 and ge-0/0/5 in WAN-VR; inet.0 keeps only the out-of-band management default (paper sections 3.5, 5.4).
+# Replace before use: <hub-MAC>, <mgmt-gateway>, <NODE2-MGMT-IP>, <region> (paper section 10); <cloud>: your Mist cloud;
 #   <NTP-SERVER>: the server Mist renders (profiles set pool.ntp.org); <ROOT-PASSWORD-HASH>: set by you or Mist.
 set groups wan2
 set groups lan
@@ -643,6 +644,7 @@ set routing-instances WAN-VR interface ge-0/0/5.0
 set routing-instances lan routing-options static route 0.0.0.0/0 next-table WAN-VR.inet.0
 set routing-instances lan routing-options static route 0.0.0.0/0 preference 200
 set routing-instances lan routing-options instance-import vpn_OrgOverlay_bgp
+set routing-instances lan system services dhcp-local-server overrides no-unicast-replies
 set routing-instances lan system services dhcp-local-server active-leasequery peer-address 10.10.10.2
 set routing-instances lan system services dhcp-local-server active-leasequery timeout 60
 set routing-instances lan system services dhcp-local-server active-leasequery idle-timeout 10

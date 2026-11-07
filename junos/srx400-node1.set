@@ -1,8 +1,10 @@
-# SRX400 node 1 (Hub Profile SRX400-1, ISP 1): as-built lab configuration, display set form, generic values.
-# Not a Mist render of mist/*.json: lines derived, blocks reordered, lines left out (README); IPv6: paper 9.
-# Release: Junos OS Evolved 25.4X300-D30. LAB ONLY: ge-0/0/2 in WAN-VR and the inet.0 default (README, Good to know).
-# Replace before use: <hub-MAC>, <mgmt-gateway>, <NODE1-MGMT-IP>, <region> (README, step 2); <cloud>: your Mist cloud;
-#   <NTP-SERVER>: the server Mist renders (profiles set pool.ntp.org); <ROOT-PASSWORD-HASH>: set by you or Mist.
+# SRX400 node 1 (Hub Profile SRX400-1, ISP 1): configuration in display set form, generic values.
+# Left out: adoption, access and box-local lines, DHCP reservations, secrets (paper section 10); IPv6: paper section 9.
+# Release: Junos OS Evolved 25.4X300-D30.3
+# ge-0/0/2 and ge-0/0/5 in WAN-VR; inet.0 keeps only the out-of-band management default (paper sections 3.5, 5.4).
+# Replace before use: <hub-MAC>, <mgmt-gateway>, <NODE1-MGMT-IP>, <region> and the IPv6 /60 2001:db8:2000::/60
+#   (paper sections 9.1 and 10); <cloud>: your Mist cloud; <ROOT-PASSWORD-HASH>: set by you or Mist;
+#   <NTP-SERVER>: the server Mist renders (profiles set pool.ntp.org).
 set groups wan
 set groups lan
 set groups apbr security advance-policy-based-routing profile IOT rule 01 match dynamic-application any
@@ -661,6 +663,7 @@ set routing-instances WAN-VR interface ge-0/0/5.0
 set routing-instances lan routing-options rib lan.inet6.0 static route ::/0 next-table WAN-VR.inet6.0
 set routing-instances lan routing-options static route 0.0.0.0/0 next-table WAN-VR.inet.0
 set routing-instances lan routing-options instance-import vpn_OrgOverlay_bgp
+set routing-instances lan system services dhcp-local-server overrides no-unicast-replies
 set routing-instances lan system services dhcp-local-server active-leasequery peer-address 10.10.10.3
 set routing-instances lan system services dhcp-local-server active-leasequery timeout 60
 set routing-instances lan system services dhcp-local-server active-leasequery idle-timeout 10
